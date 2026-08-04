@@ -1,0 +1,917 @@
+/* Reset mínimo */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--surface-page);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin: 0;
+}
+
+/* Sólo para lectores de pantalla */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+:where(a, button, summary, input, [tabindex]):focus-visible {
+  outline: 2px solid var(--series-1);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ---------- Shell ---------- */
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app__main {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--sp-5) var(--sp-4) var(--sp-6);
+}
+
+/* ---------- Cabecera ---------- */
+
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--surface-1);
+  border-bottom: 1px solid var(--border);
+}
+
+.app-header__bar {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: var(--sp-3) var(--sp-4);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--sp-4);
+  flex-wrap: wrap;
+}
+
+.app-header__identity {
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header__title {
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.app-header__subtitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-3);
+  flex-wrap: wrap;
+}
+
+.file-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  min-width: 0;
+}
+
+.file-badge__name {
+  font-size: 0.82rem;
+  font-weight: 500;
+  max-width: 22ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.file-badge__meta {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ---------- Botones ---------- */
+
+.button {
+  appearance: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  background: var(--series-1);
+  color: #ffffff;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-block;
+}
+
+.button:hover:not(:disabled) {
+  filter: brightness(0.94);
+}
+
+.button:disabled {
+  opacity: 0.55;
+  cursor: default;
+}
+
+.button--ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border-color: var(--border-strong);
+}
+
+.button--ghost:hover:not(:disabled) {
+  filter: none;
+  background: var(--surface-sunken);
+  color: var(--text-primary);
+}
+
+/* ---------- Navegación de secciones ---------- */
+
+.section-nav {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 var(--sp-4);
+  display: flex;
+  gap: var(--sp-4);
+}
+
+.section-nav__item {
+  position: relative;
+  padding: var(--sp-2) 0 var(--sp-3);
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+}
+
+.section-nav__item:hover {
+  color: var(--text-primary);
+}
+
+.section-nav__item[data-active] {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* El subrayado del activo se dibuja sobre el borde de la cabecera */
+.section-nav__item[data-active]::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -1px;
+  height: 2px;
+  background: var(--series-1);
+  border-radius: 2px 2px 0 0;
+}
+
+/* ---------- Pestañas ---------- */
+
+.tab-nav {
+  display: flex;
+  gap: var(--sp-1);
+  margin-bottom: var(--sp-5);
+  padding: var(--sp-1);
+  background: var(--surface-sunken);
+  border-radius: var(--radius-lg);
+  width: fit-content;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.tab-nav__item {
+  padding: 0.4rem 0.85rem;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tab-nav__item:hover {
+  color: var(--text-primary);
+}
+
+.tab-nav__item[data-active] {
+  background: var(--surface-1);
+  color: var(--text-primary);
+  box-shadow: var(--shadow-card);
+}
+
+/* ---------- Carga de archivo ---------- */
+
+.file-upload {
+  width: 100%;
+}
+
+.file-upload--compact {
+  width: auto;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.file-upload__zone {
+  border: 1px dashed var(--border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface-1);
+  padding: var(--sp-6) var(--sp-4);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.file-upload__zone[data-dragging] {
+  border-color: var(--series-1);
+  background: var(--surface-sunken);
+}
+
+.file-upload__title {
+  font-weight: 600;
+}
+
+.file-upload__hint {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  max-width: 52ch;
+  margin-bottom: var(--sp-2);
+}
+
+.file-upload__error {
+  margin-top: var(--sp-3);
+  padding: var(--sp-3);
+  border-radius: var(--radius);
+  border: 1px solid var(--status-critical);
+  background: var(--surface-1);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+}
+
+/* En la cabecera el error tiene que caber sin empujar la navegación */
+.file-upload__error--compact {
+  margin-top: 0;
+  padding: var(--sp-1) var(--sp-2);
+  font-size: 0.78rem;
+  max-width: 32ch;
+}
+
+/* ---------- Estado vacío ---------- */
+
+.empty-state {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-6) var(--sp-4);
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.empty-state__title {
+  font-size: 1.05rem;
+  font-weight: 600;
+}
+
+.empty-state__body {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  max-width: 52ch;
+  margin-bottom: var(--sp-3);
+}
+
+/* ---------- Tarjetas resumen ---------- */
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-5);
+}
+
+.stat-tile {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-4);
+  box-shadow: var(--shadow-card);
+}
+
+.stat-tile__label {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+/* Cifras proporcionales a propósito: tabular-nums afloja los números grandes */
+.stat-tile__value {
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin-top: var(--sp-1);
+  line-height: 1.15;
+}
+
+.stat-tile__delta {
+  font-size: 0.8rem;
+  font-weight: 500;
+  margin-top: var(--sp-1);
+}
+
+.stat-tile__delta[data-direction='up'] {
+  color: var(--delta-up);
+}
+
+.stat-tile__delta[data-direction='down'] {
+  color: var(--delta-down);
+}
+
+.stat-tile__hint {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: var(--sp-1);
+}
+
+/* ---------- Paneles ---------- */
+
+.panel-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-3);
+}
+
+.panel {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: var(--sp-4);
+  box-shadow: var(--shadow-card);
+  min-width: 0;
+  margin-bottom: var(--sp-3);
+}
+
+.panel-grid .panel {
+  margin-bottom: 0;
+}
+
+.panel__title {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.panel__subtitle {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.panel__empty {
+  color: var(--text-muted);
+  font-size: 0.88rem;
+  padding: var(--sp-5) 0;
+  text-align: center;
+}
+
+/* ---------- Tabla de datos ---------- */
+
+.data-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--sp-3);
+  font-size: 0.85rem;
+}
+
+.data-table th,
+.data-table td {
+  text-align: left;
+  padding: var(--sp-2) var(--sp-2);
+  border-bottom: 1px solid var(--gridline);
+  font-weight: 400;
+}
+
+.data-table thead th {
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom-color: var(--axis);
+}
+
+.data-table tbody tr:last-child th,
+.data-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Columnas de números: alineadas a la derecha y con cifras tabulares.
+   Selector con th/td porque `.data-table th` es más específico que una clase
+   suelta y, si no, ganaría el text-align: left de arriba. */
+.data-table th.data-table__num,
+.data-table td.data-table__num {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* ---------- Gráfica de barras por categoría ---------- */
+
+/* Los anchos de columna son variables para que la retícula y el eje se alineen
+   exactamente con la pista de las barras sin medir nada en JS. */
+.bar-chart {
+  --bar-name-col: 8.5rem;
+  /* Ancho para el importe exacto ("1.234.567 €") sin que se parta */
+  --bar-value-col: 5.75rem;
+  --bar-col-gap: 0.75rem;
+  margin-top: var(--sp-4);
+}
+
+.bar-chart__plot {
+  position: relative;
+}
+
+.bar-chart__gridlines {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: calc(var(--bar-name-col) + var(--bar-col-gap));
+  right: calc(var(--bar-value-col) + var(--bar-col-gap));
+  pointer-events: none;
+}
+
+/* Hairline sólida de 1px, un paso por encima de la superficie. Nunca discontinua */
+.bar-chart__gridline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--gridline);
+}
+
+.bar-chart__gridline[data-zero] {
+  background: var(--axis);
+}
+
+.bar-chart__row {
+  position: relative;
+  display: grid;
+  grid-template-columns: var(--bar-name-col) 1fr var(--bar-value-col);
+  column-gap: var(--bar-col-gap);
+  align-items: center;
+  /* Zona de pulsación cómoda, muy por encima del mínimo de 24px */
+  min-height: 40px;
+  border-radius: var(--radius-sm);
+}
+
+.bar-chart__name {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.bar-chart__row[data-active] .bar-chart__name,
+.bar-chart__row[data-active] .bar-chart__value {
+  color: var(--text-primary);
+}
+
+.bar-chart__track {
+  position: relative;
+  display: block;
+  /* Marca fina: por debajo del tope de 24px, y sobra aire en la banda */
+  height: 20px;
+}
+
+/* Extremo del dato redondeado, base cuadrada sobre la línea de referencia */
+.bar-chart__fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: var(--series-1);
+  border-radius: 0 4px 4px 0;
+  min-width: 2px;
+}
+
+/* Con importe negativo el extremo redondeado es el izquierdo */
+.bar-chart__fill[data-negative] {
+  border-radius: 4px 0 0 4px;
+}
+
+/* El realce del hover va en la marca, no en un fondo que taparía la retícula */
+.bar-chart__row[data-active] .bar-chart__fill {
+  filter: brightness(1.12);
+}
+
+.bar-chart__value {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.bar-chart__axis {
+  position: relative;
+  height: 1.1rem;
+  margin: var(--sp-2) calc(var(--bar-value-col) + var(--bar-col-gap)) 0
+    calc(var(--bar-name-col) + var(--bar-col-gap));
+}
+
+.bar-chart__tick {
+  position: absolute;
+  top: 0;
+  transform: translateX(-50%);
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.bar-chart__tick[data-edge='start'] {
+  transform: translateX(0);
+}
+
+.bar-chart__tick[data-edge='end'] {
+  transform: translateX(-100%);
+}
+
+/* ---------- Gráfica de evolución temporal ---------- */
+
+.line-chart {
+  margin-top: var(--sp-4);
+}
+
+.line-chart__frame {
+  position: relative;
+  /* Evita que el navegador se quede el gesto antes de llegar a pointermove */
+  touch-action: none;
+}
+
+.line-chart__svg {
+  display: block;
+}
+
+.line-chart__gridline {
+  stroke: var(--gridline);
+  stroke-width: 1;
+}
+
+.line-chart__gridline[data-zero] {
+  stroke: var(--axis);
+}
+
+/* En SVG el texto se pinta con fill, no con color */
+.line-chart__tick {
+  fill: var(--text-muted);
+  font-size: 0.7rem;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Lavado al 10%, nunca un bloque saturado */
+.line-chart__area {
+  fill: var(--series-1);
+  fill-opacity: 0.1;
+  stroke: none;
+}
+
+.line-chart__line {
+  fill: none;
+  stroke: var(--series-1);
+  stroke-width: 2;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.line-chart__crosshair {
+  stroke: var(--axis);
+  stroke-width: 1;
+}
+
+/* Anillo de 2px del color de la superficie: mantiene el punto legible donde
+   cruza la línea */
+.line-chart__dot {
+  fill: var(--series-1);
+  stroke: var(--surface-1);
+  stroke-width: 2;
+}
+
+.line-chart__end-label {
+  fill: var(--text-secondary);
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+/* ---------- Tooltip de gráfica ---------- */
+
+.chart-tooltip {
+  position: absolute;
+  top: 50%;
+  z-index: 5;
+  transform: translate(8px, -50%);
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: var(--sp-2);
+  background: var(--surface-1);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px rgba(11, 11, 11, 0.12);
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.chart-tooltip[data-flip] {
+  transform: translate(-8px, -50%) translateX(-100%);
+}
+
+.chart-tooltip--floating {
+  top: 0;
+  transform: translate(10px, -50%);
+}
+
+.chart-tooltip--floating[data-flip] {
+  transform: translate(-10px, -50%) translateX(-100%);
+}
+
+/* El valor manda; la etiqueta acompaña */
+.chart-tooltip__value {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.chart-tooltip__meta {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+/* ---------- Vista de datos de la gráfica ---------- */
+
+.chart-table {
+  margin-top: var(--sp-4);
+  border-top: 1px solid var(--gridline);
+  padding-top: var(--sp-2);
+}
+
+.chart-table__summary {
+  cursor: pointer;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.chart-table__summary:hover {
+  color: var(--text-primary);
+}
+
+/* Una tabla ancha hace scroll dentro de su contenedor, nunca la página */
+.chart-table__scroll {
+  overflow-x: auto;
+}
+
+/* ---------- Barra de cumplimiento ---------- */
+
+.progress-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-4);
+  margin-top: var(--sp-4);
+}
+
+.progress {
+  min-width: 0;
+}
+
+.progress__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--sp-3);
+}
+
+.progress__label {
+  font-size: 0.88rem;
+  font-weight: 500;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.progress__value {
+  font-size: 0.88rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.progress__value[data-severity='good'] {
+  color: var(--delta-up);
+}
+
+.progress__value[data-severity='warning'] {
+  color: var(--text-primary);
+}
+
+.progress__value[data-severity='critical'] {
+  color: var(--status-critical);
+}
+
+.progress__value[data-severity='none'] {
+  color: var(--text-muted);
+  font-weight: 500;
+}
+
+/* Pista neutra, no un paso más claro del relleno.
+   La regla general es que la pista sea de la misma rampa que el relleno, pero
+   eso presupone un relleno de tono fijo; aquí el relleno cambia de color con la
+   severidad, así que una pista azul con relleno naranja se leería como un
+   segundo segmento de datos en vez de como el hueco que falta. */
+.progress__track {
+  margin-top: var(--sp-2);
+  height: 10px;
+  background: var(--surface-sunken);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress__fill {
+  height: 100%;
+  border-radius: 0 4px 4px 0;
+  background: var(--seq-400);
+  transition: width 200ms ease-out;
+}
+
+.progress__fill[data-severity='good'] {
+  background: var(--status-good);
+}
+
+.progress__fill[data-severity='warning'] {
+  background: var(--status-warning);
+}
+
+.progress__fill[data-severity='critical'] {
+  background: var(--status-critical);
+}
+
+.progress__fill[data-severity='none'] {
+  background: transparent;
+}
+
+.progress__detail {
+  margin-top: var(--sp-1);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.progress__detail-sep {
+  font-variant-numeric: normal;
+}
+
+/* ---------- Incidencias de importación ---------- */
+
+.issues {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--status-warning);
+  border-radius: var(--radius);
+  padding: var(--sp-3);
+  margin-bottom: var(--sp-4);
+  font-size: 0.85rem;
+}
+
+.issues__summary {
+  cursor: pointer;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+/* Icono + etiqueta: el color de estado nunca va solo */
+.issues__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--status-warning);
+  color: #0b0b0b;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.issues__list {
+  margin: var(--sp-3) 0 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+  max-height: 18rem;
+  overflow-y: auto;
+}
+
+.issues__list li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-2);
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--gridline);
+}
+
+.issues__severity {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 1px 6px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-strong);
+  flex: none;
+}
+
+.issues__severity[data-severity='error'] {
+  border-color: var(--status-critical);
+  color: var(--status-critical);
+}
+
+.issues__row,
+.issues__column {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  flex: none;
+}
+
+.issues__message {
+  color: var(--text-secondary);
+}
+
+.issues__more {
+  margin-top: var(--sp-2);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 640px) {
+  .app-header__bar {
+    align-items: flex-start;
+  }
+
+  .file-badge {
+    align-items: flex-start;
+  }
+
+  .stat-tile__value {
+    font-size: 1.5rem;
+  }
+}

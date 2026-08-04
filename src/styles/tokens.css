@@ -1,0 +1,148 @@
+/**
+ * Design tokens del dashboard.
+ *
+ * La paleta categórica está validada para daltonismo y contraste en modo claro
+ * y oscuro (ΔE CVD >= 8 entre pares adyacentes, banda de luminosidad, contraste
+ * vs. superficie). Los valores oscuros NO son un "flip" automático de los claros:
+ * son los mismos tonos re-escalonados para la superficie oscura.
+ *
+ * Si cambias los colores de marca, hay que re-validar la paleta: los pares
+ * adyacentes son lo que hace legible una gráfica de barras apiladas.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* Superficies e ink */
+  --surface-1: #fcfcfb; /* superficie de gráfica / tarjeta */
+  --surface-page: #f9f9f7; /* plano de página */
+  --surface-sunken: #f0efec;
+  --text-primary: #0b0b0b;
+  --text-secondary: #52514e;
+  --text-muted: #898781; /* ejes y etiquetas */
+  --gridline: #e1e0d9; /* hairline */
+  --axis: #c3c2b7;
+  --border: rgba(11, 11, 11, 0.1);
+  --border-strong: rgba(11, 11, 11, 0.18);
+
+  /* Paleta categórica — orden fijo, nunca ciclado.
+     A partir del 9º valor: agrupar en "Otros", no generar un tono nuevo. */
+  --series-1: #2a78d6; /* azul */
+  --series-2: #eb6834; /* naranja */
+  --series-3: #1baf7a; /* aqua */
+  --series-4: #eda100; /* amarillo */
+  --series-5: #e87ba4; /* magenta */
+  --series-6: #008300; /* verde */
+  --series-7: #4a3aa7; /* violeta */
+  --series-8: #e34948; /* rojo */
+
+  /* Rampa secuencial (una sola tonalidad, claro -> oscuro) para magnitud */
+  --seq-100: #cde2fb;
+  --seq-250: #86b6ef;
+  --seq-400: #3987e5;
+  --seq-550: #1c5cab;
+  --seq-700: #0d366b;
+
+  /* Estado — reservado, nunca se reutiliza como "serie 9".
+     Siempre acompañado de icono + etiqueta, nunca color a secas. */
+  --status-good: #0ca30c;
+  --status-warning: #fab219;
+  --status-serious: #ec835a;
+  --status-critical: #d03b3b;
+
+  /* Texto de delta (cumplimiento vs objetivo) */
+  --delta-up: #006300;
+  --delta-down: #d03b3b;
+
+  /* Semántica del dominio: Real vs Objetivo.
+     Real = serie 1, Objetivo = neutro/línea de referencia. El objetivo es un
+     umbral, no una segunda serie que compita visualmente con el dato real. */
+  --real: var(--series-1);
+  --objetivo: var(--series-7);
+
+  /* Espaciado y radios */
+  --sp-1: 0.25rem;
+  --sp-2: 0.5rem;
+  --sp-3: 0.75rem;
+  --sp-4: 1rem;
+  --sp-5: 1.5rem;
+  --sp-6: 2rem;
+  --radius-sm: 4px;
+  --radius: 8px;
+  --radius-lg: 12px;
+
+  --font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --shadow-card: 0 1px 2px rgba(11, 11, 11, 0.04);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:where(:not([data-theme='light'])) {
+    color-scheme: dark;
+
+    --surface-1: #1a1a19;
+    --surface-page: #0d0d0d;
+    --surface-sunken: #242422;
+    --text-primary: #ffffff;
+    --text-secondary: #c3c2b7;
+    --text-muted: #898781;
+    --gridline: #2c2c2a;
+    --axis: #383835;
+    --border: rgba(255, 255, 255, 0.1);
+    --border-strong: rgba(255, 255, 255, 0.18);
+
+    --series-1: #3987e5;
+    --series-2: #d95926;
+    --series-3: #199e70;
+    --series-4: #c98500;
+    --series-5: #d55181;
+    --series-6: #008300;
+    --series-7: #9085e9;
+    --series-8: #e66767;
+
+    --seq-100: #0d366b;
+    --seq-250: #184f95;
+    --seq-400: #2a78d6;
+    --seq-550: #5598e7;
+    --seq-700: #cde2fb;
+
+    --delta-up: #0ca30c;
+    --delta-down: #e66767;
+
+    --shadow-card: none;
+  }
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --surface-1: #1a1a19;
+  --surface-page: #0d0d0d;
+  --surface-sunken: #242422;
+  --text-primary: #ffffff;
+  --text-secondary: #c3c2b7;
+  --text-muted: #898781;
+  --gridline: #2c2c2a;
+  --axis: #383835;
+  --border: rgba(255, 255, 255, 0.1);
+  --border-strong: rgba(255, 255, 255, 0.18);
+
+  --series-1: #3987e5;
+  --series-2: #d95926;
+  --series-3: #199e70;
+  --series-4: #c98500;
+  --series-5: #d55181;
+  --series-6: #008300;
+  --series-7: #9085e9;
+  --series-8: #e66767;
+
+  --seq-100: #0d366b;
+  --seq-250: #184f95;
+  --seq-400: #2a78d6;
+  --seq-550: #5598e7;
+  --seq-700: #cde2fb;
+
+  --delta-up: #0ca30c;
+  --delta-down: #e66767;
+
+  --shadow-card: none;
+}
