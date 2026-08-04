@@ -9,6 +9,7 @@ import RevenueByCategory from './charts/RevenueByCategory';
 import RevenueTrendChart from './charts/RevenueTrendChart';
 import NotFoundPage from '../pages/NotFoundPage';
 import { getDimensionBySlug } from '../constants/dimensions';
+import { getSedeColor, isSedeDimension } from '../constants/sedeColors';
 import { useData } from '../context/DataContext';
 import {
   MAX_CATEGORIAS_COLOREADAS,
@@ -135,7 +136,13 @@ export default function DimensionDashboard() {
       <SummaryCards cards={cards} />
 
       <div className="panel-grid">
-        <RevenueByCategory data={byCategory} dimensionLabel={dimension.label} />
+        <RevenueByCategory
+          data={byCategory}
+          dimensionLabel={dimension.label}
+          // Sólo la dimensión Sede tiene color por entidad; en Formación y Área
+          // el color no significa nada y las barras comparten el suyo.
+          colorFor={isSedeDimension(dimensionSlug) ? getSedeColor : undefined}
+        />
         <RevenueTrendChart data={byPeriodo} />
       </div>
 

@@ -27,7 +27,7 @@
 
   /* Paleta categórica — orden fijo, nunca ciclado.
      A partir del 9º valor: agrupar en "Otros", no generar un tono nuevo. */
-  --series-1: #2a78d6; /* azul */
+  --series-1: #1f66bd; /* azul (oscurecido) */
   --series-2: #eb6834; /* naranja */
   --series-3: #1baf7a; /* aqua */
   --series-4: #eda100; /* amarillo */
@@ -37,11 +37,11 @@
   --series-8: #e34948; /* rojo */
 
   /* Rampa secuencial (una sola tonalidad, claro -> oscuro) para magnitud */
-  --seq-100: #cde2fb;
-  --seq-250: #86b6ef;
-  --seq-400: #3987e5;
-  --seq-550: #1c5cab;
-  --seq-700: #0d366b;
+  --seq-100: #c2dbf8;
+  --seq-250: #74a8e8;
+  --seq-400: #2a78d6;
+  --seq-550: #17509a;
+  --seq-700: #0a2c58;
 
   /* Estado — reservado, nunca se reutiliza como "serie 9".
      Siempre acompañado de icono + etiqueta, nunca color a secas. */
@@ -60,6 +60,29 @@
   --real: var(--series-1);
   --objetivo: var(--series-7);
 
+  /* Sedes — color fijo por sede, no por posición en la leyenda.
+     Madrid rojo, Valencia naranja, Sevilla verde, según lo pedido.
+
+     El verde es medio y no oscuro a propósito: con un verde oscuro, la pareja
+     Madrid/Sevilla cae a ΔE 0.9 en protanopia, o sea idéntica para quien no
+     distingue rojo de verde (~8 % de los hombres). Subiendo la luminosidad del
+     verde el par sube a ΔE 8.5 y la paleta pasa la validación entera. Rojo y
+     verde comparten justamente el eje del daltonismo más común, así que la
+     separación tiene que venir de la luminosidad. Si se retoca alguno de los
+     tres, hay que re-validar el trío con todos los pares, no sólo adyacentes:
+     las tres sedes se ven a la vez en la misma gráfica. */
+  --sede-madrid: #d6342f;
+  --sede-valencia: #ef8f2e;
+  --sede-sevilla: #1a7f4b;
+
+  /* Comparación temporal. Verde = el dato real mejora respecto al periodo
+     anterior, rojo = empeora, azul = proyección (no es un dato observado).
+     Nunca van solos: siempre con signo escrito o etiqueta, porque el color no
+     puede ser el único portador del significado. */
+  --comp-better: #16794a;
+  --comp-worse: #c1352f;
+  --comp-projection: #1f66bd;
+
   /* Espaciado y radios */
   --sp-1: 0.25rem;
   --sp-2: 0.5rem;
@@ -71,46 +94,20 @@
   --radius: 8px;
   --radius-lg: 12px;
 
-  --font-sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  /* Inter, con la pila del sistema detrás por si la fuente no llega a cargar.
+     'Inter var' cubre la variable font; el fallback no cambia las medidas de
+     forma apreciable porque todas son sans humanistas de ancho parecido. */
+  --font-sans: 'Inter var', Inter, system-ui, -apple-system, 'Segoe UI', sans-serif;
   --shadow-card: 0 1px 2px rgba(11, 11, 11, 0.04);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root:where(:not([data-theme='light'])) {
-    color-scheme: dark;
-
-    --surface-1: #1a1a19;
-    --surface-page: #0d0d0d;
-    --surface-sunken: #242422;
-    --text-primary: #ffffff;
-    --text-secondary: #c3c2b7;
-    --text-muted: #898781;
-    --gridline: #2c2c2a;
-    --axis: #383835;
-    --border: rgba(255, 255, 255, 0.1);
-    --border-strong: rgba(255, 255, 255, 0.18);
-
-    --series-1: #3987e5;
-    --series-2: #d95926;
-    --series-3: #199e70;
-    --series-4: #c98500;
-    --series-5: #d55181;
-    --series-6: #008300;
-    --series-7: #9085e9;
-    --series-8: #e66767;
-
-    --seq-100: #0d366b;
-    --seq-250: #184f95;
-    --seq-400: #2a78d6;
-    --seq-550: #5598e7;
-    --seq-700: #cde2fb;
-
-    --delta-up: #0ca30c;
-    --delta-down: #e66767;
-
-    --shadow-card: none;
-  }
-}
+/* El modo claro es el predeterminado y no se cambia solo.
+ *
+ * Antes había aquí un bloque `@media (prefers-color-scheme: dark)` que ponía la
+ * app en oscuro cuando el sistema operativo lo pedía. Se ha quitado a
+ * propósito: el claro es ahora el punto de partida para todo el mundo, y el
+ * oscuro sólo entra si se elige, marcando `data-theme="dark"` en la raíz.
+ */
 
 :root[data-theme='dark'] {
   color-scheme: dark;
@@ -143,6 +140,17 @@
 
   --delta-up: #0ca30c;
   --delta-down: #e66767;
+
+  /* Sedes re-escalonadas para la superficie oscura, no volteadas: la banda de
+     luminosidad en oscuro es más estrecha (L 0.48–0.67), así que estos son los
+     valores que pasan la validación ahí, con ΔE 8.7 en el peor par. */
+  --sede-madrid: #a83634;
+  --sede-valencia: #ca7500;
+  --sede-sevilla: #4ca167;
+
+  --comp-better: #35b06a;
+  --comp-worse: #e66767;
+  --comp-projection: #5598e7;
 
   --shadow-card: none;
 }

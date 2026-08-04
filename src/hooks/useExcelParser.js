@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import * as XLSX from 'xlsx';
 
+import { decodeCsv, isTextFile } from '../utils/decodeText';
 import {
   FIELD_LABELS,
   REQUIRED_FIELDS,
@@ -118,11 +119,22 @@ export function useExcelParser() {
       const buffer = await file.arrayBuffer();
       if (requestRef.current !== requestId) return null;
 
-      const workbook = XLSX.read(new Uint8Array(buffer), {
-        type: 'array',
-        cellDates: false,
-        cellText: false,
-      });
+      // Un CSV se decodifica a texto antes de entregarlo a SheetJS, que si
+      // recibe los bytes crudos los toma por CP1252 y convierte los acentos de
+      // un UTF-8 en mojibake (`Área` -> `Ãrea`), con lo que las columnas
+      // acentuadas dejan de reconocerse. Los formatos binarios van como están:
+      // el .xlsx ya guarda su XML en UTF-8 y SheetJS lo lee bien.
+      const workbook = isTextFile(file.name)
+        ? XLSX.read(decodeCsv(buffer).text, {
+            type: 'string',
+            cellDates: false,
+            cellText: false,
+          })
+        : XLSX.read(new Uint8Array(buffer), {
+            type: 'array',
+            cellDates: false,
+            cellText: false,
+          });
 
       if (!workbook.SheetNames || workbook.SheetNames.length === 0) {
         throw new Error('El libro no contiene ninguna hoja.');
