@@ -40,23 +40,44 @@ npm run build
 Hay un archivo de ejemplo en `samples/ejemplo-ingresos.csv` para probar sin
 tener que preparar un Excel.
 
-> **Aviso:** `npm install` no se ha podido ejecutar en el entorno donde se
-> escribió este código: la política de red del entorno bloquea
-> `registry.npmjs.org` (`host_not_allowed`). El código fuente está completo y
-> las versiones están fijadas en `package.json`, pero **las dependencias no se
-> han instalado ni se ha ejecutado `vite build`**. Para desbloquear npm hay que
-> añadir `registry.npmjs.org` al allowlist de egress del entorno, o instalar en
-> local.
+Las dependencias ya se instalan y el JSX ya se transpila: `npm install` resuelve
+las 6 versiones fijadas (el árbol está congelado en `package-lock.json`), los 88
+tests pasan y `vite build` compila sin errores.
+
+> **Fallos conocidos, sin corregir todavía:**
 >
-> Lo que sí está verificado sin dependencias: los 88 tests pasan con el runner
-> nativo de Node; una comprobación estática confirma que todos los imports
-> resuelven y que no hay clases CSS sin definir; y las gráficas se han
-> renderizado en Chromium (con los módulos y el CSS reales) y revisado a la
-> vista en claro y en oscuro. Ese repaso visual encontró tres fallos que los
-> tests no ven y que están corregidos: la última etiqueta del eje X se cortaba
-> contra el borde del SVG, la pista vacía de las barras de cumplimiento era azul
-> con relleno naranja (se leía como un segundo dato en vez de como el hueco que
-> falta), y en la gráfica de barras convivían dos notaciones de importe.
+> 1. **Un CSV en UTF-8 sin BOM llega como mojibake** y la importación se cae con
+>    *«Faltan columnas obligatorias: Tipo Formación, Área»*. `XLSX.read` con
+>    `type: 'array'` decodifica los bytes del CSV como CP1252, así que
+>    `Área` → `Ãrea` y la normalización de cabeceras, que quita acentos, no
+>    puede repararlo. Afecta a `samples/ejemplo-ingresos.csv`, que es
+>    justamente UTF-8 sin BOM. Con BOM o en CP1252 funciona; el `.xlsx` no está
+>    afectado porque guarda XML UTF-8.
+> 2. **Los importes de 1.000 a 9.999 salen sin separador de miles**
+>    (`9500 €` junto a `12.000 €`). Es el `useGrouping: "auto"` de ICU en
+>    es-ES, que no agrupa enteros de cuatro dígitos; se corrige en
+>    `utils/format.js` con `useGrouping: 'always'`.
+> 3. **Las dos últimas marcas del eje de barras se tocan** y se leen `70 k80 k`:
+>    todos los huecos son de 12 px menos el último, que es de 0 px.
+
+## Publicación en GitHub Pages
+
+`.github/workflows/deploy-pages.yml` compila y publica en cada push. Pages sirve
+el proyecto en un subdirectorio, no en la raíz del dominio, y de ahí las tres
+piezas del montaje:
+
+- `vite.config.js` fija `base` al nombre del repo **sólo al compilar**; en
+  `vite dev` la base sigue siendo `/`.
+- El `basename` del router sale de `import.meta.env.BASE_URL`, o sea de esa
+  misma base: se declara una vez y no hay dos sitios que puedan discrepar.
+- El workflow copia `index.html` a `404.html`. Pages no reescribe rutas
+  desconocidas hacia el índice, así que recargar `/reales/sede` daría 404;
+  sirviendo el mismo documento como `404.html`, el router resuelve en cliente y
+  las URLs siguen siendo reales y enlazables en vez de pasar a hash. El precio
+  es que un deep link se sirve con status HTTP 404, invisible para quien navega.
+
+El *source* de Pages tiene que estar en **GitHub Actions** (Settings → Pages),
+no en «Deploy from a branch», o el despliegue falla.
 
 ## Rutas
 
