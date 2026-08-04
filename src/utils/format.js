@@ -53,6 +53,24 @@ export function formatPercent(value) {
   return PERCENT.format(value);
 }
 
+const DECIMAL_1 = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 1 });
+
+/**
+ * Valor abreviado para ticks de eje: 50000 -> "50 k", 2500 -> "2,5 k".
+ *
+ * No usa el formato compacto de Intl con moneda porque en es-ES devuelve
+ * "50 mil €", demasiado largo para un eje. El símbolo € sobra: lo dice el
+ * título de la gráfica.
+ */
+export function formatAxisValue(value) {
+  if (!Number.isFinite(value)) return '';
+
+  const abs = Math.abs(value);
+  if (abs >= 1000000) return `${DECIMAL_1.format(value / 1000000)} M`;
+  if (abs >= 1000) return `${DECIMAL_1.format(value / 1000)} k`;
+  return INTEGER.format(value);
+}
+
 /** Delta con signo explícito, para comparaciones vs objetivo. */
 export function formatSignedEUR(value) {
   if (!Number.isFinite(value)) return '—';

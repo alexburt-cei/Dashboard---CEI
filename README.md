@@ -5,16 +5,28 @@ subido por el usuario. React + Vite + React Router.
 
 ## Estado actual
 
-Hecho en este primer paso:
-
 1. **Estructura de carpetas y rutas** — las 6 vistas navegables.
-2. **Parser de Excel** — con tests (68 casos, `npm test`).
+2. **Parser de Excel** — con tests.
 3. **Layout de navegación** — secciones + pestañas, carga de archivo, tarjetas resumen.
+4. **Gráficas** — barras por categoría y evolución temporal, sin dependencias.
 
-Pendiente (siguiente paso): las **gráficas con Recharts**. Ahora mismo
-`RevenueByCategory` y `RevenueTrendChart` pintan los datos ya agregados como
-tabla con barras CSS. Esa tabla no es descartable: se queda como vista de datos
-accesible debajo de la gráfica cuando entre Recharts.
+88 casos de test (`npm test`) sobre el parser, las agregaciones y las escalas.
+
+### Las gráficas no usan librería
+
+Están escritas a mano, sin Recharts ni equivalente. El reparto no es arbitrario:
+
+- **Evolución temporal → SVG.** Una línea necesita geometría de trazado y una
+  retícula de puntas para el crosshair, y sus etiquetas de eje son cortas
+  ("ene 2026").
+- **Barras por categoría → CSS.** Los nombres de categoría vienen del Excel del
+  usuario y pueden ser larguísimos. SVG no tiene `text-overflow`, así que una
+  etiqueta larga se saldría del trazado; con CSS el truncado con elipsis sale
+  gratis. Las barras cumplen las mismas medidas igualmente.
+
+Ambas llevan tooltip (con teclado además de ratón: flechas en la línea, tabulador
+en las barras) y su tabla de datos plegable debajo, para que ningún valor
+dependa del hover.
 
 ## Puesta en marcha
 
@@ -32,12 +44,19 @@ tener que preparar un Excel.
 > escribió este código: la política de red del entorno bloquea
 > `registry.npmjs.org` (`host_not_allowed`). El código fuente está completo y
 > las versiones están fijadas en `package.json`, pero **las dependencias no se
-> han instalado ni se ha ejecutado `vite build`**. Lo que sí está verificado:
-> los 68 tests del parser y de las agregaciones pasan con el runner nativo de
-> Node (no necesita dependencias), y una comprobación estática confirma que
-> todos los imports resuelven y que no hay clases CSS sin definir. Para
-> desbloquear npm hay que añadir `registry.npmjs.org` al allowlist de egress
-> del entorno, o instalar en local.
+> han instalado ni se ha ejecutado `vite build`**. Para desbloquear npm hay que
+> añadir `registry.npmjs.org` al allowlist de egress del entorno, o instalar en
+> local.
+>
+> Lo que sí está verificado sin dependencias: los 88 tests pasan con el runner
+> nativo de Node; una comprobación estática confirma que todos los imports
+> resuelven y que no hay clases CSS sin definir; y las gráficas se han
+> renderizado en Chromium (con los módulos y el CSS reales) y revisado a la
+> vista en claro y en oscuro. Ese repaso visual encontró tres fallos que los
+> tests no ven y que están corregidos: la última etiqueta del eje X se cortaba
+> contra el borde del SVG, la pista vacía de las barras de cumplimiento era azul
+> con relleno naranja (se leía como un segundo dato en vez de como el hueco que
+> falta), y en la gráfica de barras convivían dos notaciones de importe.
 
 ## Rutas
 
@@ -72,15 +91,18 @@ src/
 │   │   ├── SectionNav.jsx          Reales / Objetivos
 │   │   └── TabNav.jsx              Formación / Área / Sede
 │   ├── charts/
-│   │   ├── RevenueByCategory.jsx   barras por categoría (provisional)
-│   │   └── RevenueTrendChart.jsx   evolución temporal (provisional)
+│   │   ├── ChartTable.jsx          vista de datos plegable de cada gráfica
+│   │   ├── RevenueByCategory.jsx   barras por categoría (CSS)
+│   │   └── RevenueTrendChart.jsx   evolución temporal (SVG + crosshair)
 │   ├── DimensionDashboard.jsx      cuerpo de pestaña, sirve a las 6 vistas
 │   ├── IssuesPanel.jsx             incidencias de la importación
 │   ├── ProgressBar.jsx             cumplimiento real vs objetivo
 │   └── SummaryCards.jsx            tarjetas resumen
 ├── constants/dimensions.js         registro de secciones y dimensiones
 ├── context/DataContext.jsx         dataset importado + persistencia
-├── hooks/useExcelParser.js         lectura del fichero con SheetJS
+├── hooks/
+│   ├── useElementWidth.js          ancho medido para el SVG (ResizeObserver)
+│   └── useExcelParser.js           lectura del fichero con SheetJS
 ├── pages/
 │   ├── RealesPage.jsx              TabNav + subrutas de Reales
 │   ├── ObjetivosPage.jsx           TabNav + subrutas de Objetivos
@@ -92,6 +114,7 @@ src/
 └── utils/
     ├── excelParser.js              parseo puro + tests
     ├── dataTransform.js            agregaciones + tests
+    ├── scale.js                    ejes, ticks y trazados + tests
     └── format.js                   formateo es-ES
 ```
 
@@ -156,3 +179,7 @@ Decisiones que conviene conocer:
 - La paleta de `tokens.css` está validada para daltonismo y contraste en claro y
   oscuro. Si se cambian los colores de marca hay que re-validarla: lo que hace
   legible una gráfica es la separación entre colores adyacentes.
+- Los ejes empiezan siempre en cero (`buildScale`). Recortar la base exagera las
+  diferencias: es la forma más fácil de que una gráfica mienta sin que nadie lo
+  note. Y los meses sin ingresos se rellenan a 0 en la serie temporal, porque
+  saltárselos deforma la pendiente.
