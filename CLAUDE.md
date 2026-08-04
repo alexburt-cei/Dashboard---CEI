@@ -1,0 +1,3 @@
+# Estado de Graphify en esta Sesión (Solo Local)
+- **Falta Skill en Claude Code**: El comando `/graphify` falla porque esta sesión remota busca habilidades en `~/.claude/skills/` y la skill de Graphify no está instalada ahí. Funciona en tu entorno local (OpenCode/Claude), pero no en esta sesión web.
+- **CLI fuera del PATH**: El ejecutable `graphify` no está en el PATH de este entorno. Por lo tanto, comandos como `graphify update .` no se pueden ejecutar aquí. El grafo actual no incluye los 26 archivos del último commit; recuerda ejecutar `graphify . --code-only` localmente antes de abrir la próxima sesión.
