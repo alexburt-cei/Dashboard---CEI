@@ -2,7 +2,8 @@ import { useState } from 'react';
 
 import ChartTable from './ChartTable';
 import { buildScale } from '../../utils/scale';
-import { formatAxisValue, formatEUR, formatInteger, formatPercent } from '../../utils/format';
+import { useFormatters } from '../../utils/useFormatters';
+import { useI18n } from '../../i18n/I18nContext';
 
 /**
  * Ingresos por categoría, en barras horizontales.
@@ -32,12 +33,14 @@ import { formatAxisValue, formatEUR, formatInteger, formatPercent } from '../../
  */
 export default function RevenueByCategory({ data, dimensionLabel, colorFor }) {
   const [activeIndex, setActiveIndex] = useState(-1);
+  const { t } = useI18n();
+  const { formatAxisValue, formatEUR, formatInteger, formatPercent } = useFormatters();
 
   if (!data || data.length === 0) {
     return (
       <section className="panel">
-        <h2 className="panel__title">Ingresos por {dimensionLabel}</h2>
-        <p className="panel__empty">No hay datos para esta vista.</p>
+        <h2 className="panel__title">{t('chart.ingresosPor', { dimension: dimensionLabel })}</h2>
+        <p className="panel__empty">{t('vacio.vista')}</p>
       </section>
     );
   }
@@ -47,8 +50,8 @@ export default function RevenueByCategory({ data, dimensionLabel, colorFor }) {
 
   return (
     <section className="panel">
-      <h2 className="panel__title">Ingresos por {dimensionLabel}</h2>
-      <p className="panel__subtitle">Total del periodo, de mayor a menor</p>
+      <h2 className="panel__title">{t('chart.ingresosPor', { dimension: dimensionLabel })}</h2>
+      <p className="panel__subtitle">{t('chart.totalPeriodo')}</p>
 
       <div className="bar-chart">
         <div className="bar-chart__plot">
@@ -86,9 +89,12 @@ export default function RevenueByCategory({ data, dimensionLabel, colorFor }) {
                 tabIndex={0}
                 // El readout completo va en aria-label: con lector de pantalla
                 // no hay que reconstruirlo saltando entre celdas.
-                aria-label={`${item.key}: ${formatEUR(item.total)}, ${formatPercent(
-                  item.share,
-                )} del total, ${formatInteger(item.count)} registros`}
+                aria-label={t('chart.readout', {
+                  categoria: item.key,
+                  importe: formatEUR(item.total),
+                  porcentaje: formatPercent(item.share),
+                  n: formatInteger(item.count),
+                })}
                 onPointerEnter={() => setActiveIndex(index)}
                 onPointerLeave={() => setActiveIndex(-1)}
                 onFocus={() => setActiveIndex(index)}
@@ -125,7 +131,7 @@ export default function RevenueByCategory({ data, dimensionLabel, colorFor }) {
                       <span className="chart-tooltip__value">{formatEUR(item.total)}</span>
                       <span className="chart-tooltip__meta">
                         {formatPercent(item.share)} del total · {formatInteger(item.count)}{' '}
-                        registros
+                        {t('chart.registros').toLowerCase()}
                       </span>
                     </span>
                   ) : null}
@@ -161,9 +167,9 @@ export default function RevenueByCategory({ data, dimensionLabel, colorFor }) {
         caption={`Ingresos totales por ${dimensionLabel}, de mayor a menor`}
         columns={[
           { key: 'categoria', label: dimensionLabel },
-          { key: 'ingreso', label: 'Ingreso', numeric: true },
-          { key: 'share', label: '% del total', numeric: true },
-          { key: 'registros', label: 'Registros', numeric: true },
+          { key: 'ingreso', label: t('chart.ingreso'), numeric: true },
+          { key: 'share', label: t('chart.porcentajeTotal'), numeric: true },
+          { key: 'registros', label: t('chart.registros'), numeric: true },
         ]}
         rows={data.map((item) => ({
           key: item.key,

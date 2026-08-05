@@ -3,7 +3,8 @@ import { useCallback, useState } from 'react';
 import ChartTable from './ChartTable';
 import { useElementWidth } from '../../hooks/useElementWidth';
 import { areaPath, buildScale, labelInterval, linePath, nearestIndex } from '../../utils/scale';
-import { formatAxisValue, formatEUR, formatInteger } from '../../utils/format';
+import { useFormatters } from '../../utils/useFormatters';
+import { useI18n } from '../../i18n/I18nContext';
 
 /** Geometría del trazado. La altura del contenedor incluye la banda del eje X. */
 const PLOT_HEIGHT = 200;
@@ -32,6 +33,8 @@ const X_LABEL_WIDTH = 60;
  * }} props
  */
 export default function RevenueTrendChart({ data }) {
+  const { t } = useI18n();
+  const { formatAxisValue, formatEUR, formatInteger } = useFormatters();
   const [containerRef, width] = useElementWidth();
   const [activeIndex, setActiveIndex] = useState(-1);
 
@@ -80,7 +83,7 @@ export default function RevenueTrendChart({ data }) {
   if (count === 0) {
     return (
       <section className="panel">
-        <h2 className="panel__title">Evolución temporal</h2>
+        <h2 className="panel__title">{t('chart.evolucion')}</h2>
         <p className="panel__empty">No hay datos para esta vista.</p>
       </section>
     );
@@ -112,8 +115,8 @@ export default function RevenueTrendChart({ data }) {
 
   return (
     <section className="panel">
-      <h2 className="panel__title">Evolución temporal</h2>
-      <p className="panel__subtitle">Ingresos por mes</p>
+      <h2 className="panel__title">{t('chart.evolucion')}</h2>
+      <p className="panel__subtitle">{t('chart.ingresosPorMes')}</p>
 
       <div className="line-chart" ref={containerRef}>
         {ready ? (
@@ -234,7 +237,8 @@ export default function RevenueTrendChart({ data }) {
               >
                 <span className="chart-tooltip__value">{formatEUR(activePoint.total)}</span>
                 <span className="chart-tooltip__meta">
-                  {activePoint.label} · {formatInteger(activePoint.count)} registros
+                  {activePoint.label} ·{' '}
+                  {t('chart.nRegistros', { n: formatInteger(activePoint.count) })}
                 </span>
               </div>
             ) : null}
@@ -248,9 +252,9 @@ export default function RevenueTrendChart({ data }) {
       <ChartTable
         caption="Ingresos totales por mes, en orden cronológico"
         columns={[
-          { key: 'mes', label: 'Mes' },
-          { key: 'ingreso', label: 'Ingreso', numeric: true },
-          { key: 'registros', label: 'Registros', numeric: true },
+          { key: 'mes', label: t('chart.mes') },
+          { key: 'ingreso', label: t('chart.ingreso'), numeric: true },
+          { key: 'registros', label: t('chart.registros'), numeric: true },
         ]}
         rows={points.map((point) => ({
           key: point.periodo,

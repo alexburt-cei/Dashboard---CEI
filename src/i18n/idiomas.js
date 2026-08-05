@@ -181,6 +181,15 @@ export const DICCIONARIOS = {
     'tema.activar': 'Cambiar a {modo}',
     'idioma.etiqueta': 'Idioma',
 
+    'chart.registros': "Registros",
+    'chart.ingreso': "Ingreso",
+    'chart.porcentajeTotal': "% del total",
+    'chart.mes': "Mes",
+    'chart.nRegistros': "{n} registros",
+    'chart.readout': "{categoria}: {importe}, {porcentaje} del total, {n} registros",
+    'dim.cumplimientoDe': "Cumplimiento de {label}",
+    'chart.ingresoRealSobreObjetivo': "Ingreso real sobre objetivo",
+
     'notfound.titulo': 'Esta página no existe',
     'notfound.volver': 'Volver al inicio',
   },
@@ -319,6 +328,15 @@ export const DICCIONARIOS = {
     'tema.oscuro': 'Dark mode',
     'tema.activar': 'Switch to {modo}',
     'idioma.etiqueta': 'Language',
+
+    'chart.registros': "Records",
+    'chart.ingreso': "Revenue",
+    'chart.porcentajeTotal': "% of total",
+    'chart.mes': "Month",
+    'chart.nRegistros': "{n} records",
+    'chart.readout': "{categoria}: {importe}, {porcentaje} of total, {n} records",
+    'dim.cumplimientoDe': "{label} attainment",
+    'chart.ingresoRealSobreObjetivo': "Actual revenue against target",
 
     'notfound.titulo': 'This page does not exist',
     'notfound.volver': 'Back to start',
@@ -460,6 +478,15 @@ export const DICCIONARIOS = {
     'tema.oscuro': 'Mode sombre',
     'tema.activar': 'Passer en {modo}',
     'idioma.etiqueta': 'Langue',
+
+    'chart.registros': "Enregistrements",
+    'chart.ingreso': "Revenu",
+    'chart.porcentajeTotal': "% du total",
+    'chart.mes': "Mois",
+    'chart.nRegistros': "{n} enregistrements",
+    'chart.readout': "{categoria} : {importe}, {porcentaje} du total, {n} enregistrements",
+    'dim.cumplimientoDe': "Atteinte de {label}",
+    'chart.ingresoRealSobreObjetivo': "Revenu réel par rapport à l’objectif",
 
     'notfound.titulo': 'Cette page n’existe pas',
     'notfound.volver': 'Retour à l’accueil',

@@ -10,6 +10,8 @@ import RevenueTrendChart from './charts/RevenueTrendChart';
 import NotFoundPage from '../pages/NotFoundPage';
 import { getDimensionBySlug } from '../constants/dimensions';
 import { getSedeColor, isSedeDimension } from '../constants/sedeColors';
+import { useFormatters } from '../utils/useFormatters';
+import { useI18n } from '../i18n/I18nContext';
 import { useData } from '../context/DataContext';
 import {
   MAX_CATEGORIAS_COLOREADAS,
@@ -20,7 +22,7 @@ import {
   summarize,
   totalIngreso,
 } from '../utils/dataTransform';
-import { formatEURCompact, formatInteger, formatPercent, formatSignedEUR } from '../utils/format';
+
 
 /**
  * Cuerpo de una pestaña. Sirve a las seis combinaciones de sección x dimensión:
@@ -30,6 +32,8 @@ import { formatEURCompact, formatInteger, formatPercent, formatSignedEUR } from 
 export default function DimensionDashboard() {
   const { section } = useOutletContext();
   const { dimension: dimensionSlug } = useParams();
+  const { t } = useI18n();
+  const { formatEURCompact, formatInteger, formatPercent, formatSignedEUR } = useFormatters();
   const { rows, issues, hasData } = useData();
 
   const dimension = getDimensionBySlug(dimensionSlug);
@@ -57,9 +61,9 @@ export default function DimensionDashboard() {
   if (!hasData) {
     return (
       <div className="empty-state">
-        <p className="empty-state__title">Todavía no hay datos</p>
+        <p className="empty-state__title">{t('vacio.titulo')}</p>
         <p className="empty-state__body">
-          Sube el Excel de ingresos para ver el detalle por {dimension.label.toLowerCase()}.
+          {t('vacio.detalle', { dimension: t(`dim.${dimension.slug}`).toLowerCase() })}
         </p>
         <FileUpload />
       </div>
@@ -89,28 +93,28 @@ export default function DimensionDashboard() {
   const cards = [
     {
       id: 'total',
-      label: isObjetivos ? 'Objetivo total' : 'Ingresos totales',
+      label: isObjetivos ? t('card.objetivoTotal') : t('card.ingresosTotales'),
       value: formatEURCompact(summary.total),
-      hint: `${formatInteger(summary.registros)} registros`,
+      hint: t('card.registros', { n: formatInteger(summary.registros) }),
     },
     {
       id: 'media',
-      label: 'Media mensual',
+      label: t('card.mediaMensual'),
       value: formatEURCompact(summary.mediaMensual),
-      hint: `${formatInteger(summary.periodos)} ${summary.periodos === 1 ? 'mes' : 'meses'} con datos`,
+      hint: t('card.mesesConDatos', { n: formatInteger(summary.periodos) }),
     },
     {
       id: 'categorias',
-      label: dimension.label,
+      label: t(`dim.${dimension.slug}`),
       value: formatInteger(summary.categorias),
-      hint: summary.top ? `Mayor: ${summary.top.key}` : undefined,
+      hint: summary.top ? t('card.mayor', { valor: summary.top.key }) : undefined,
     },
   ];
 
   if (isObjetivos) {
     cards.push({
       id: 'cumplimiento',
-      label: 'Cumplimiento global',
+      label: t('card.cumplimientoGlobal'),
       value: formatPercent(cumplimientoGlobal),
       delta:
         cumplimientoGlobal === null
@@ -123,9 +127,9 @@ export default function DimensionDashboard() {
   } else if (summary.top) {
     cards.push({
       id: 'top',
-      label: `Mayor ${dimension.label.toLowerCase()}`,
+      label: t('card.mayorDe', { dimension: t(`dim.${dimension.slug}`).toLowerCase() }),
       value: formatEURCompact(summary.top.total),
-      hint: `${summary.top.key} · ${formatPercent(summary.top.share)} del total`,
+      hint: t('card.delTotal', { valor: summary.top.key, porcentaje: formatPercent(summary.top.share) }),
     });
   }
 
@@ -138,7 +142,10 @@ export default function DimensionDashboard() {
       <div className="panel-grid">
         <RevenueByCategory
           data={byCategory}
-          dimensionLabel={dimension.label}
+          // La etiqueta traducida, no la del registro: `dimension.label` es la
+          // constante en castellano y viajaba tal cual al título de la gráfica,
+          // dejando un «Revenue by Tipo de Formación» a medio traducir.
+          dimensionLabel={t(`dim.${dimension.slug}`)}
           // Sólo la dimensión Sede tiene color por entidad; en Formación y Área
           // el color no significa nada y las barras comparten el suyo.
           colorFor={isSedeDimension(dimensionSlug) ? getSedeColor : undefined}
@@ -148,8 +155,10 @@ export default function DimensionDashboard() {
 
       {isObjetivos ? (
         <section className="panel">
-          <h2 className="panel__title">Cumplimiento por {dimension.label.toLowerCase()}</h2>
-          <p className="panel__subtitle">Ingreso real sobre objetivo</p>
+          <h2 className="panel__title">
+            {t('chart.cumplimientoPor', { dimension: t(`dim.${dimension.slug}`).toLowerCase() })}
+          </h2>
+          <p className="panel__subtitle">{t('chart.ingresoRealSobreObjetivo')}</p>
           <div className="progress-list">
             {comparison.map((item) => (
               <ProgressBar

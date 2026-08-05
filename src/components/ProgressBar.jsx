@@ -1,4 +1,5 @@
-import { formatEUR, formatPercent } from '../utils/format';
+import { useFormatters } from '../utils/useFormatters';
+import { useI18n } from '../i18n/I18nContext';
 
 /**
  * Umbrales de cumplimiento. El color acompaña, pero el porcentaje va escrito
@@ -22,6 +23,8 @@ function severityOf(cumplimiento) {
  * @param {{label: string, real: number, objetivo: number, cumplimiento: number|null}} props
  */
 export default function ProgressBar({ label, real, objetivo, cumplimiento }) {
+  const { t } = useI18n();
+  const { formatEUR, formatPercent } = useFormatters();
   const severity = severityOf(cumplimiento);
   const width = cumplimiento === null ? 0 : Math.min(cumplimiento, 1) * 100;
   const valueText =
@@ -41,7 +44,7 @@ export default function ProgressBar({ label, real, objetivo, cumplimiento }) {
       <div
         className="progress__track"
         role="progressbar"
-        aria-label={`Cumplimiento de ${label}`}
+        aria-label={t('dim.cumplimientoDe', { label })}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={cumplimiento === null ? undefined : Math.round(cumplimiento * 100)}
