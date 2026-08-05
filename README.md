@@ -162,6 +162,40 @@ colapsados), así que `Tipo Formación`, `TIPO_FORMACION` y `tipo de formacion`
 valen igual. Cada campo acepta además sinónimos (`Importe`/`Facturación` para
 `Ingreso`, `Centro`/`Campus` para `Sede`…) — la lista está en `COLUMN_ALIASES`.
 
+**Opcionales**, para las métricas de matriculación del Resumen Global:
+
+| Columna | Valores aceptados | Para qué |
+|---|---|---|
+| `Canal` | `Online`, `Web`, `Internet`, `Digital` · `Offline`, `Presencial`, `Teléfono`, `Oficina` | Matriculaciones online vs offline |
+| `Tipo Matrícula` | `Nueva`, `Alta`, `New Enrolment` · `Renovación`, `Re-matrícula`, `Renewal`, `Continuidad` | Reporte de New Enrolments vs Re-enrolment |
+| `Matrículas` | entero ≥ 0 (`12`, `1.234`) | Recuento de alumnos, que no es lo mismo que el importe |
+
+Son opcionales de verdad: un Excel sin ellas se importa igual y lo que se apaga
+son los paneles que dependen de esa columna, no el archivo entero. Si la columna
+está pero un valor no se reconoce, se avisa con su número de fila y **la fila se
+importa igualmente** — el ingreso, que es el dato principal, sigue siendo válido.
+Un valor desconocido no se adivina nunca.
+
+### Temporadas: las convocatorias
+
+Lo comparativo no va por meses ni por estaciones, sino por las cuatro
+convocatorias de CEI — **enero, abril, junio y octubre**. Cada una cubre desde su
+mes de apertura hasta el anterior a la siguiente, así que el año queda cubierto
+sin huecos ni solapes:
+
+| Convocatoria | Meses |
+|---|---|
+| enero | enero, febrero, marzo |
+| abril | abril, mayo |
+| junio | junio, julio, agosto, septiembre |
+| octubre | octubre, noviembre, diciembre |
+
+Importa para el «hace un año a estas alturas»: la comparación va contra **la
+misma convocatoria** del año anterior, no contra el mes natural, porque las
+convocatorias no duran lo mismo. Si el centro cambia su calendario, se edita
+`CONVOCATORIAS` en `src/utils/temporada.js` y todo lo demás se recalcula — no hay
+meses escritos a mano en ningún otro sitio.
+
 ### Qué acepta
 
 | Campo | Formatos |

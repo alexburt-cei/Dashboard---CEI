@@ -36,8 +36,13 @@ jobs:
       - name: Tests
         run: npm test
 
+      # Pages es un project site y sirve bajo /Dashboard---CEI/, así que el
+      # prefijo se declara aquí. Por defecto la base es '/', que es lo que
+      # necesitan Vercel y cualquier dominio propio.
       - name: Build
         run: npm run build
+        env:
+          VITE_BASE_PATH: /Dashboard---CEI/
 
       # GitHub Pages no reescribe rutas desconocidas hacia index.html, así que
       # al recargar /reales/sede devolvería 404. Sirviendo el mismo documento

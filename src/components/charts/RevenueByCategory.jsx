@@ -16,16 +16,21 @@ import { formatAxisValue, formatEUR, formatInteger, formatPercent } from '../../
  * Barras horizontales (y no columnas) porque los nombres son largos: en
  * vertical habría que rotar las etiquetas.
  *
- * Todas las barras comparten color a propósito. El trabajo aquí es comparar
+ * Por defecto todas las barras comparten color. El trabajo aquí es comparar
  * magnitudes, y la longitud ya lo dice; teñir cada barra más oscura cuanto
  * mayor es duplicaría la misma información en el único canal libre que queda.
+ *
+ * `colorFor` rompe esa regla sólo cuando el color significa *identidad* y no
+ * magnitud — el caso de las sedes, donde Madrid es roja siempre. Recibe la clave
+ * de la fila y devuelve un color, o null para dejar el de por defecto.
  *
  * @param {{
  *   data: Array<{key: string, total: number, count: number, share: number}>,
  *   dimensionLabel: string,
+ *   colorFor?: (key: string) => string|null,
  * }} props
  */
-export default function RevenueByCategory({ data, dimensionLabel }) {
+export default function RevenueByCategory({ data, dimensionLabel, colorFor }) {
   const [activeIndex, setActiveIndex] = useState(-1);
 
   if (!data || data.length === 0) {
@@ -97,7 +102,15 @@ export default function RevenueByCategory({ data, dimensionLabel }) {
                   <span
                     className="bar-chart__fill"
                     data-negative={item.total < 0 || undefined}
-                    style={{ left: `${start * 100}%`, width: `${span * 100}%` }}
+                    style={{
+                      left: `${start * 100}%`,
+                      width: `${span * 100}%`,
+                      // Sin color propio se cae al del CSS, que es el de por
+                      // defecto: no se inventa un tono para una clave suelta.
+                      ...(colorFor?.(item.key)
+                        ? { background: colorFor(item.key) }
+                        : null),
+                    }}
                   />
 
                   {isActive ? (

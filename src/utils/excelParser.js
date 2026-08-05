@@ -39,6 +39,8 @@
  * @property {string}      message
  */
 
+import { temporadaKey } from './temporada.js';
+
 /** Etiqueta para categorías vacías; mejor visible que una barra sin nombre. */
 export const SIN_ESPECIFICAR = '(Sin especificar)';
 
@@ -52,6 +54,14 @@ export const REQUIRED_FIELDS = [
   'tipoDato',
 ];
 
+/**
+ * Columnas opcionales. Si están se aprovechan; si faltan, la importación sigue
+ * adelante y son los paneles que dependen de ellas los que se apagan, en lugar
+ * de rechazar el archivo. Así un Excel que sólo trae ingresos no deja de
+ * funcionar cuando se añaden métricas nuevas.
+ */
+export const OPTIONAL_FIELDS = ['canal', 'tipoMatricula', 'matriculas'];
+
 /** Nombre legible de cada campo, para los mensajes de error. */
 export const FIELD_LABELS = {
   fecha: 'Fecha',
@@ -60,6 +70,9 @@ export const FIELD_LABELS = {
   sede: 'Sede',
   ingreso: 'Ingreso',
   tipoDato: 'Tipo Dato',
+  canal: 'Canal',
+  tipoMatricula: 'Tipo Matrícula',
+  matriculas: 'Matrículas',
 };
 
 /**
@@ -90,7 +103,101 @@ export const COLUMN_ALIASES = {
     'importe total',
   ],
   tipoDato: ['tipo dato', 'tipo de dato', 'tipodato', 'tipo', 'dato', 'escenario'],
+  canal: ['canal', 'canales', 'via', 'modalidad', 'channel', 'origen'],
+  tipoMatricula: [
+    'tipo matricula',
+    'tipo de matricula',
+    'tipomatricula',
+    'matricula tipo',
+    'enrolment type',
+    'enrollment type',
+  ],
+  matriculas: [
+    'matriculas',
+    'matriculaciones',
+    'numero matriculas',
+    'n matriculas',
+    'alumnos',
+    'enrolments',
+    'enrollments',
+    'inscripciones',
+  ],
 };
+
+/** Canal de venta. Online / Offline, más sus sinónimos habituales. */
+const ONLINE_VALUES = new Set(['online', 'on line', 'on-line', 'web', 'internet', 'digital']);
+const OFFLINE_VALUES = new Set([
+  'offline',
+  'off line',
+  'off-line',
+  'presencial',
+  'sede',
+  'telefono',
+  'oficina',
+  'in person',
+]);
+
+/** Matrícula nueva vs renovación. */
+const NUEVA_VALUES = new Set([
+  'nueva',
+  'nuevas',
+  'nuevo',
+  'alta',
+  'new',
+  'new enrolment',
+  'new enrollment',
+  'primera matricula',
+]);
+const RENOVACION_VALUES = new Set([
+  'renovacion',
+  'renovaciones',
+  'renovada',
+  're matricula',
+  'rematricula',
+  're enrolment',
+  're enrollment',
+  'reenrolment',
+  'renewal',
+  'continuidad',
+]);
+
+/**
+ * Canal normalizado: 'online' | 'offline' | null.
+ *
+ * Como con `Tipo Dato`, un valor que no se reconoce no se adivina: devuelve
+ * null y quien llama decide si eso merece una incidencia.
+ */
+export function parseCanal(value) {
+  const key = normalizeKey(value ?? '');
+  if (!key) return null;
+  if (ONLINE_VALUES.has(key)) return 'online';
+  if (OFFLINE_VALUES.has(key)) return 'offline';
+  return null;
+}
+
+/** Tipo de matrícula normalizado: 'nueva' | 'renovacion' | null. */
+export function parseTipoMatricula(value) {
+  const key = normalizeKey(value ?? '');
+  if (!key) return null;
+  if (NUEVA_VALUES.has(key)) return 'nueva';
+  if (RENOVACION_VALUES.has(key)) return 'renovacion';
+  return null;
+}
+
+/**
+ * Recuento de matrículas: entero >= 0, o null si la celda está vacía.
+ *
+ * Se reutiliza `parseIngreso` para los separadores porque el recuento viene con
+ * las mismas manías de formato que un importe, pero luego se exige entero: media
+ * matrícula no existe, y un decimal ahí es un error de datos que conviene ver.
+ */
+export function parseMatriculas(value) {
+  if (value === null || value === undefined || String(value).trim() === '') return null;
+  const numero = parseIngreso(value);
+  if (numero === null || !Number.isFinite(numero)) return null;
+  if (numero < 0 || !Number.isInteger(numero)) return null;
+  return numero;
+}
 
 const REAL_VALUES = new Set([
   'real',
@@ -506,7 +613,12 @@ export function toPeriodo(date) {
 
 function isEmptyRow(row) {
   if (!Array.isArray(row)) return true;
-  return row.every((cell) => cell === null || cell === undefined || String(cell).trim() === '');
+  return row.every(isBlank);
+}
+
+/** Celda sin contenido: null, undefined o sólo espacios. */
+function isBlank(cell) {
+  return cell === null || cell === undefined || String(cell).trim() === '';
 }
 
 /**
@@ -663,6 +775,55 @@ export function parseSheetRows(matrix, options = {}) {
       continue;
     }
 
+    // Campos opcionales. Que la columna no exista y que exista con un valor
+    // ilegible son cosas distintas: lo primero es normal y calla, lo segundo se
+    // reporta pero no descarta la fila, porque el ingreso —que es el dato
+    // principal— sí es válido.
+    const canal = indexes.canal === undefined ? null : parseCanal(cells[indexes.canal]);
+    if (indexes.canal !== undefined && canal === null && !isBlank(cells[indexes.canal])) {
+      issues.push({
+        severity: 'warning',
+        row: rowNumber,
+        column: FIELD_LABELS.canal,
+        value: cells[indexes.canal],
+        message: 'Canal no reconocido; se esperaba Online u Offline. La fila se importa sin canal.',
+      });
+    }
+
+    const tipoMatricula =
+      indexes.tipoMatricula === undefined ? null : parseTipoMatricula(cells[indexes.tipoMatricula]);
+    if (
+      indexes.tipoMatricula !== undefined &&
+      tipoMatricula === null &&
+      !isBlank(cells[indexes.tipoMatricula])
+    ) {
+      issues.push({
+        severity: 'warning',
+        row: rowNumber,
+        column: FIELD_LABELS.tipoMatricula,
+        value: cells[indexes.tipoMatricula],
+        message:
+          'Tipo Matrícula no reconocido; se esperaba Nueva o Renovación. ' +
+          'La fila se importa sin tipo.',
+      });
+    }
+
+    const matriculas =
+      indexes.matriculas === undefined ? null : parseMatriculas(cells[indexes.matriculas]);
+    if (
+      indexes.matriculas !== undefined &&
+      matriculas === null &&
+      !isBlank(cells[indexes.matriculas])
+    ) {
+      issues.push({
+        severity: 'warning',
+        row: rowNumber,
+        column: FIELD_LABELS.matriculas,
+        value: cells[indexes.matriculas],
+        message: 'Matrículas debe ser un entero de 0 o más. La fila se importa sin recuento.',
+      });
+    }
+
     tipos[tipoDato] += 1;
 
     rows.push({
@@ -670,11 +831,15 @@ export function parseSheetRows(matrix, options = {}) {
       fecha,
       periodo: toPeriodo(fecha),
       anio: fecha.getUTCFullYear(),
+      temporada: temporadaKey(fecha),
       tipoFormacion: parseCategoria(cells[indexes.tipoFormacion]),
       area: parseCategoria(cells[indexes.area]),
       sede: parseCategoria(cells[indexes.sede]),
       ingreso,
       tipoDato,
+      canal,
+      tipoMatricula,
+      matriculas,
     });
   }
 
