@@ -6,11 +6,21 @@
  * verticalmente (tablas y ticks de eje), vía CSS.
  */
 
+/**
+ * `useGrouping: 'always'` no es cosmético.
+ *
+ * Por omisión, ICU en es-ES no agrupa los enteros de cuatro cifras: 9500 sale
+ * «9500 €» mientras 12000 sale «12.000 €». Aislado es la convención tipográfica
+ * española, pero en una columna de importes convive con los agrupados y se lee
+ * como dos notaciones distintas para lo mismo — y en un salto de 9.500 a 12.000
+ * el ojo compara longitudes de cadena, no valores.
+ */
 const EUR_FULL = new Intl.NumberFormat('es-ES', {
   style: 'currency',
   currency: 'EUR',
   minimumFractionDigits: 0,
   maximumFractionDigits: 0,
+  useGrouping: 'always',
 });
 
 const EUR_COMPACT = new Intl.NumberFormat('es-ES', {
@@ -20,7 +30,10 @@ const EUR_COMPACT = new Intl.NumberFormat('es-ES', {
   maximumFractionDigits: 1,
 });
 
-const INTEGER = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 0 });
+const INTEGER = new Intl.NumberFormat('es-ES', {
+  maximumFractionDigits: 0,
+  useGrouping: 'always',
+});
 
 const PERCENT = new Intl.NumberFormat('es-ES', {
   style: 'percent',

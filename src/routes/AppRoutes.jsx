@@ -1,10 +1,16 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 
-import { DEFAULT_DIMENSION_SLUG, DEFAULT_ROUTE, SECTIONS } from '../constants/dimensions';
+import {
+  DEFAULT_DIMENSION_SLUG,
+  DEFAULT_ROUTE,
+  RESUMEN,
+  SECTIONS,
+} from '../constants/dimensions';
 import DimensionDashboard from '../components/DimensionDashboard';
 import NotFoundPage from '../pages/NotFoundPage';
 import ObjetivosPage from '../pages/ObjetivosPage';
 import RealesPage from '../pages/RealesPage';
+import ResumenGlobalPage from '../pages/ResumenGlobalPage';
 
 const SECTION_PAGES = {
   reales: RealesPage,
@@ -34,6 +40,8 @@ export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to={DEFAULT_ROUTE} replace />} />
+
+      <Route path={RESUMEN.slug} element={<ResumenGlobalPage />} />
 
       {SECTIONS.map((section) => {
         const SectionPage = SECTION_PAGES[section.slug];

@@ -2,7 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 
 import {
   DEFAULT_DIMENSION_SLUG,
-  SECTIONS,
+  NAV_ITEMS,
   getDimensionBySlug,
 } from '../../constants/dimensions';
 
@@ -25,17 +25,20 @@ export default function SectionNav() {
 
   return (
     <nav className="section-nav" aria-label="Secciones">
-      {SECTIONS.map((section) => {
-        const isActive = section.slug === sectionSlug;
+      {NAV_ITEMS.map((item) => {
+        const isActive = item.slug === sectionSlug;
+        // Resumen Global no tiene pestañas, así que su enlace es la ruta a
+        // secas; a las otras se les conserva la dimensión activa.
+        const to = item.hasDimensions ? `${item.path}/${targetDimension}` : item.path;
         return (
           <Link
-            key={section.slug}
-            to={`${section.path}/${targetDimension}`}
+            key={item.slug}
+            to={to}
             className="section-nav__item"
             data-active={isActive || undefined}
             aria-current={isActive ? 'page' : undefined}
           >
-            {section.label}
+            {item.label}
           </Link>
         );
       })}

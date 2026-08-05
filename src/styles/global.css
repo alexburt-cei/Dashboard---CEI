@@ -915,3 +915,318 @@ p {
     font-size: 1.5rem;
   }
 }
+
+/* ============================================================
+   Resumen Global
+   ============================================================ */
+
+.resumen__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+.resumen__title {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.resumen__meta {
+  margin: 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+}
+
+/* --- Fila de filtros -------------------------------------------------- */
+
+/* Los filtros van en una fila sobre las gráficas, para que se vea qué cambia
+   al tocarlos. En pantalla estrecha envuelven en vez de comprimirse. */
+.filtros {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: var(--sp-3);
+  padding: var(--sp-4);
+  margin-bottom: var(--sp-5);
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+}
+
+.filtro {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-1);
+  min-width: 9rem;
+}
+
+.filtro__label {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.filtro__control {
+  padding: var(--sp-2);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.85rem;
+  background: var(--surface-page);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+}
+
+.filtro__control:focus-visible {
+  outline: 2px solid var(--series-1);
+  outline-offset: 1px;
+}
+
+.filtro__hint {
+  color: var(--text-muted);
+  font-size: 0.72rem;
+}
+
+.filtros__reset {
+  margin-left: auto;
+}
+
+/* --- Leyenda de gráfica ---------------------------------------------- */
+
+.chart-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-3);
+  padding: 0;
+  margin: 0 0 var(--sp-4);
+  list-style: none;
+}
+
+.chart-legend__item {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+}
+
+.chart-legend__swatch {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  flex: none;
+}
+
+/* Lo estimado va rayado además de azul: la textura sobrevive al daltonismo,
+   al blanco y negro y al modo de contraste forzado. */
+.chart-legend__swatch[data-estimado],
+.season-chart__bar[data-estimado] {
+  background-image: repeating-linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.55) 0 2px,
+    transparent 2px 5px
+  );
+}
+
+/* --- Comparativa por convocatoria (columnas verticales) --------------- */
+
+.season-chart {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(4rem, 1fr));
+  align-items: end;
+  gap: var(--sp-4);
+  min-height: 15rem;
+}
+
+.season-chart__col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--sp-2);
+  height: 100%;
+  justify-content: flex-end;
+}
+
+.season-chart__value {
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.season-chart__track {
+  display: flex;
+  align-items: flex-end;
+  width: 100%;
+  max-width: 4.5rem;
+  height: 100%;
+  min-height: 8rem;
+}
+
+/* Extremo redondeado sólo arriba: la barra nace en la línea del cero y
+   redondear también la base la despegaría visualmente del eje. */
+.season-chart__bar {
+  width: 100%;
+  border-radius: 4px 4px 0 0;
+  transition: height 120ms ease-out;
+}
+
+.season-chart__label {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+.season-chart__tag,
+.data-table__tag {
+  color: var(--comp-projection);
+  font-size: 0.68rem;
+  font-style: normal;
+  font-weight: 500;
+}
+
+.season-chart__axis {
+  display: none;
+}
+
+/* --- Barras apiladas del reporte mensual ------------------------------ */
+
+.stack-chart {
+  display: flex;
+  flex-direction: column;
+  gap: var(--sp-2);
+}
+
+.stack-chart__row {
+  display: grid;
+  grid-template-columns: 5.5rem 1fr 3rem;
+  align-items: center;
+  gap: var(--sp-3);
+}
+
+.stack-chart__label {
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+}
+
+/* El hueco de 2px entre segmentos evita que dos colores contiguos se lean
+   como una sola barra de un tono intermedio. */
+.stack-chart__track {
+  display: flex;
+  gap: 2px;
+  align-items: center;
+  height: 1.1rem;
+  background: var(--surface-sunken);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+}
+
+.stack-chart__seg {
+  height: 100%;
+  min-width: 0;
+}
+
+.stack-chart__seg:first-child {
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+.stack-chart__seg:last-child {
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.stack-chart__value {
+  color: var(--text-primary);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+/* --- Tarjetas de canal ------------------------------------------------ */
+
+.canal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: var(--sp-3);
+  margin-bottom: var(--sp-4);
+}
+
+.canal-card {
+  padding: var(--sp-3);
+  background: var(--surface-page);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.canal-card__label {
+  margin: 0 0 var(--sp-1);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+}
+
+.canal-card__value {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.canal-card__share,
+.canal-card__hint {
+  margin: var(--sp-1) 0 0;
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.canal-card__delta {
+  margin: var(--sp-2) 0 0;
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.canal-card__delta[data-direction='up'],
+.data-table__num[data-direction='up'] {
+  color: var(--delta-up);
+}
+
+.canal-card__delta[data-direction='down'],
+.data-table__num[data-direction='down'] {
+  color: var(--delta-down);
+}
+
+/* --- Paneles apagados y avisos --------------------------------------- */
+
+.panel--muted {
+  background: var(--surface-page);
+  border-style: dashed;
+}
+
+.panel--empty {
+  text-align: center;
+}
+
+.data-table__hint {
+  display: block;
+  color: var(--text-muted);
+  font-size: 0.7rem;
+  font-weight: 400;
+}
+
+/* Fila de estimación: fondo sutil para que no se confunda con lo facturado. */
+.data-table tr[data-estimado] {
+  background: color-mix(in oklab, var(--comp-projection) 6%, transparent);
+}
+
+.panel__empty code {
+  padding: 1px 4px;
+  font-size: 0.85em;
+  background: var(--surface-sunken);
+  border-radius: 3px;
+}

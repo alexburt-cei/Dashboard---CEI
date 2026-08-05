@@ -66,8 +66,31 @@ export const DIMENSIONS = [
 /** Pestaña a la que se redirige cuando la URL sólo trae la sección. */
 export const DEFAULT_DIMENSION_SLUG = DIMENSIONS[0].slug;
 
+/**
+ * Resumen Global. Va aparte de `SECTIONS` porque no tiene pestañas de
+ * dimensión: no se mira «por formación» o «por sede», mira el conjunto. Meterlo
+ * en SECTIONS habría obligado a que el router le inventara una subruta
+ * `:dimension` que no usa.
+ */
+export const RESUMEN = {
+  slug: 'resumen',
+  path: '/resumen',
+  label: 'Resumen Global',
+  hasDimensions: false,
+};
+
+/**
+ * Navegación principal, en orden. Resumen Global va primero porque es la vista
+ * de entrada: responde «cómo vamos» antes de bajar al detalle de «qué se ha
+ * facturado», que es lo que hacen las otras dos.
+ */
+export const NAV_ITEMS = [
+  RESUMEN,
+  ...SECTIONS.map((section) => ({ ...section, hasDimensions: true })),
+];
+
 /** Ruta de entrada de la app. */
-export const DEFAULT_ROUTE = `${SECTIONS[0].path}/${DEFAULT_DIMENSION_SLUG}`;
+export const DEFAULT_ROUTE = RESUMEN.path;
 
 /** @returns {Section|undefined} */
 export function getSectionBySlug(slug) {
