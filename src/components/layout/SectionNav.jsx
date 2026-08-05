@@ -1,5 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 
+import { useI18n } from '../../i18n/I18nContext';
+
 import {
   DEFAULT_DIMENSION_SLUG,
   NAV_ITEMS,
@@ -18,13 +20,14 @@ import {
  */
 export default function SectionNav() {
   const { pathname } = useLocation();
+  const { t } = useI18n();
   const [, sectionSlug, dimensionSlug] = pathname.split('/');
 
   const currentDimension = getDimensionBySlug(dimensionSlug);
   const targetDimension = currentDimension?.slug ?? DEFAULT_DIMENSION_SLUG;
 
   return (
-    <nav className="section-nav" aria-label="Secciones">
+    <nav className="section-nav" aria-label={t('nav.secciones')}>
       {NAV_ITEMS.map((item) => {
         const isActive = item.slug === sectionSlug;
         // Resumen Global no tiene pestañas, así que su enlace es la ruta a
@@ -38,7 +41,7 @@ export default function SectionNav() {
             data-active={isActive || undefined}
             aria-current={isActive ? 'page' : undefined}
           >
-            {item.label}
+            {t(`nav.${item.slug}`)}
           </Link>
         );
       })}

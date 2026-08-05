@@ -237,15 +237,16 @@ export function tablaComparativa(rows) {
   const grupos = [
     {
       id: 'ytd',
-      label: 'Year-to-date',
-      hint: `1 ene ${anio} – corte`,
+      // El módulo emite CLAVES y no texto: es lógica pura y no debe saber en qué
+      // idioma se va a pintar. La interfaz traduce; aquí sólo se dice qué decir.
+      hintKey: 'tabla.ytdHint',
+      hintValues: { anio },
       objetivo: ytd?.budget ?? 0,
       actual: ytd?.real ?? 0,
       estimado: false,
     },
     {
       id: 'mes',
-      label: 'Mes en curso',
       hint: mes ?? '—',
       objetivo: sumIngreso(delMes(objetivos(rows))),
       actual: sumIngreso(delMes(reales(rows))),
@@ -253,16 +254,14 @@ export function tablaComparativa(rows) {
     },
     {
       id: 'temporada',
-      label: 'Temporada',
-      hint: 'convocatoria en curso',
+      hintKey: 'tabla.temporadaHint',
       objetivo: stand?.objetivo ?? 0,
       actual: stand?.real ?? 0,
       estimado: false,
     },
     {
       id: 'proyeccion',
-      label: 'Proyección',
-      hint: 'cierre estimado al ritmo actual',
+      hintKey: 'tabla.proyeccionHint',
       objetivo: stand?.objetivo ?? 0,
       actual: rate?.proyeccion ?? null,
       estimado: true,

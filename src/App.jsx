@@ -1,5 +1,7 @@
 import Header from './components/layout/Header';
 import { DataProvider } from './context/DataContext';
+import { I18nProvider } from './i18n/I18nContext';
+import { ThemeProvider } from './context/ThemeContext';
 import AppRoutes from './routes/AppRoutes';
 
 /**
@@ -8,13 +10,17 @@ import AppRoutes from './routes/AppRoutes';
  */
 export default function App() {
   return (
-    <DataProvider>
-      <div className="app">
-        <Header />
-        <main className="app__main">
-          <AppRoutes />
-        </main>
-      </div>
-    </DataProvider>
+    <I18nProvider>
+      <ThemeProvider>
+        <DataProvider>
+          <div className="app">
+            <Header />
+            <main className="app__main">
+              <AppRoutes />
+            </main>
+          </div>
+        </DataProvider>
+      </ThemeProvider>
+    </I18nProvider>
   );
 }

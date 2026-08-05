@@ -1,4 +1,5 @@
-import { formatEUR, formatPercent, formatSignedEUR } from '../../utils/format';
+import { useFormatters } from '../../utils/useFormatters';
+import { useI18n } from '../../i18n/I18nContext';
 
 /**
  * Objetivo / Actual / Diferencia, repetido por grupo: Year-to-date, mes en
@@ -15,39 +16,40 @@ import { formatEUR, formatPercent, formatSignedEUR } from '../../utils/format';
  * @param {{tabla: Array<{id: string, label: string, hint: string, objetivo: number, actual: number|null, diferencia: number|null, cumplimiento: number|null, estimado: boolean}>}} props
  */
 export default function ComparativeTable({ tabla }) {
+  const { t } = useI18n();
+  const { formatEUR, formatPercent, formatSignedEUR } = useFormatters();
+
   if (!tabla || tabla.length === 0) {
     return (
       <section className="panel">
-        <h2 className="panel__title">Objetivo vs actual</h2>
-        <p className="panel__empty">No hay datos para comparar.</p>
+        <h2 className="panel__title">{t('tabla.titulo')}</h2>
+        <p className="panel__empty">{t('vacio.vista')}</p>
       </section>
     );
   }
 
   return (
     <section className="panel">
-      <h2 className="panel__title">Objetivo vs actual</h2>
-      <p className="panel__subtitle">Por periodo, con la diferencia frente al objetivo</p>
+      <h2 className="panel__title">{t('tabla.titulo')}</h2>
+      <p className="panel__subtitle">{t('tabla.subtitulo')}</p>
 
       <div className="chart-table__scroll">
         <table className="data-table">
-          <caption className="sr-only">
-            Objetivo, actual y diferencia por Year-to-date, mes en curso, temporada y proyección
-          </caption>
+          <caption className="sr-only">{t('tabla.subtitulo')}</caption>
           <thead>
             <tr>
-              <th scope="col">Periodo</th>
+              <th scope="col">{t('tabla.periodo')}</th>
               <th scope="col" className="data-table__num">
-                Objetivo
+                {t('tabla.objetivo')}
               </th>
               <th scope="col" className="data-table__num">
-                Actual
+                {t('tabla.actual')}
               </th>
               <th scope="col" className="data-table__num">
-                Diferencia
+                {t('tabla.diferencia')}
               </th>
               <th scope="col" className="data-table__num">
-                Cumplimiento
+                {t('tabla.cumplimiento')}
               </th>
             </tr>
           </thead>
@@ -55,17 +57,19 @@ export default function ComparativeTable({ tabla }) {
             {tabla.map((grupo) => (
               <tr key={grupo.id} data-estimado={grupo.estimado || undefined}>
                 <th scope="row">
-                  {grupo.label}
-                  {grupo.estimado ? <em className="data-table__tag">estimación</em> : null}
+                  {t(`tabla.${grupo.id}`)}
+                  {grupo.estimado ? (
+                    <em className="data-table__tag">{t('comp.estimacion')}</em>
+                  ) : null}
                   <small className="data-table__hint">
-                    {grupo.hint}
+                    {grupo.hintKey ? t(grupo.hintKey, grupo.hintValues) : grupo.hint}
                     {/* Un guión sin explicación se lee como un fallo de la app.
                         Diciendo por qué falta, se lee como lo que es: el Excel
                         no trae objetivo para toda la temporada. */}
                     {grupo.objetivoParcial ? (
                       <>
                         <br />
-                        sin % — el objetivo cargado no cubre la temporada completa
+                        {t('tabla.objetivoParcial')}
                       </>
                     ) : null}
                   </small>

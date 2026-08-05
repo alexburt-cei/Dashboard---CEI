@@ -1,5 +1,7 @@
 import { useId } from 'react';
 
+import { useI18n } from '../../i18n/I18nContext';
+
 /**
  * Fila de filtros del Resumen Global: rango de fechas y dimensiones.
  *
@@ -21,6 +23,7 @@ import { useId } from 'react';
  */
 export default function FilterRow({ valores, opciones, onChange, onReset, activos }) {
   const id = useId();
+  const { t } = useI18n();
 
   const multi = (campo, label, lista) => (
     <label className="filtro" htmlFor={`${id}-${campo}`}>
@@ -44,15 +47,17 @@ export default function FilterRow({ valores, opciones, onChange, onReset, activo
         ))}
       </select>
       <span className="filtro__hint">
-        {valores[campo].length === 0 ? 'Todas' : `${valores[campo].length} seleccionadas`}
+        {valores[campo].length === 0
+          ? t('filtros.todas')
+          : t('filtros.seleccionadas', { n: valores[campo].length })}
       </span>
     </label>
   );
 
   return (
-    <section className="filtros" aria-label="Filtros del resumen">
+    <section className="filtros" aria-label={t('filtros.titulo')}>
       <label className="filtro" htmlFor={`${id}-desde`}>
-        <span className="filtro__label">Desde</span>
+        <span className="filtro__label">{t('filtros.desde')}</span>
         <input
           id={`${id}-desde`}
           className="filtro__control"
@@ -64,7 +69,7 @@ export default function FilterRow({ valores, opciones, onChange, onReset, activo
       </label>
 
       <label className="filtro" htmlFor={`${id}-hasta`}>
-        <span className="filtro__label">Hasta</span>
+        <span className="filtro__label">{t('filtros.hasta')}</span>
         <input
           id={`${id}-hasta`}
           className="filtro__control"
@@ -75,9 +80,9 @@ export default function FilterRow({ valores, opciones, onChange, onReset, activo
         />
       </label>
 
-      {multi('sedes', 'Sedes', opciones.sedes)}
-      {multi('formaciones', 'Formación', opciones.formaciones)}
-      {multi('areas', 'Áreas', opciones.areas)}
+      {multi('sedes', t('filtros.sedes'), opciones.sedes)}
+      {multi('formaciones', t('filtros.formacion'), opciones.formaciones)}
+      {multi('areas', t('filtros.areas'), opciones.areas)}
 
       <button
         type="button"
@@ -85,7 +90,7 @@ export default function FilterRow({ valores, opciones, onChange, onReset, activo
         onClick={onReset}
         disabled={activos === 0}
       >
-        Limpiar{activos > 0 ? ` (${activos})` : ''}
+        {t('filtros.limpiar')}{activos > 0 ? ` (${activos})` : ''}
       </button>
     </section>
   );

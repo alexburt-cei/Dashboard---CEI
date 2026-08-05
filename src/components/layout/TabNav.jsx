@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 
 import { DIMENSIONS } from '../../constants/dimensions';
+import { useI18n } from '../../i18n/I18nContext';
 
 /**
  * Navegación de pestañas dentro de una sección: por Tipo de Formación, por Área
@@ -11,10 +12,11 @@ import { DIMENSIONS } from '../../constants/dimensions';
  */
 export default function TabNav({ section }) {
   const { pathname } = useLocation();
+  const { t } = useI18n();
   const [, , dimensionSlug] = pathname.split('/');
 
   return (
-    <nav className="tab-nav" aria-label={`Vistas de ${section.label}`}>
+    <nav className="tab-nav" aria-label={t('nav.vistasDe', { seccion: t(`nav.${section.slug}`) })}>
       {DIMENSIONS.map((dimension) => {
         const isActive = dimension.slug === dimensionSlug;
         return (
@@ -25,7 +27,7 @@ export default function TabNav({ section }) {
             data-active={isActive || undefined}
             aria-current={isActive ? 'page' : undefined}
           >
-            {dimension.label}
+            {t(`dim.${dimension.slug}`)}
           </Link>
         );
       })}

@@ -1,7 +1,9 @@
+import Controls from './Controls';
 import FileUpload from '../FileUpload';
 import SectionNav from './SectionNav';
 import { useData } from '../../context/DataContext';
-import { formatInteger } from '../../utils/format';
+import { useFormatters } from '../../utils/useFormatters';
+import { useI18n } from '../../i18n/I18nContext';
 import { periodoLabel } from '../../utils/dataTransform';
 
 /**
@@ -10,25 +12,27 @@ import { periodoLabel } from '../../utils/dataTransform';
  */
 export default function Header() {
   const { hasData, fileName, meta, clear } = useData();
+  const { t, locale } = useI18n();
+  const { formatInteger } = useFormatters();
 
   return (
     <header className="app-header">
       <div className="app-header__bar">
         <div className="app-header__identity">
-          <span className="app-header__title">Dashboard CEI</span>
-          <span className="app-header__subtitle">Ingresos por formación, área y sede</span>
+          <span className="app-header__title">{t('app.titulo')}</span>
+          <span className="app-header__subtitle">{t('app.subtitulo')}</span>
         </div>
 
         <div className="app-header__actions">
           {hasData && meta ? (
             <div className="file-badge">
               <span className="file-badge__name" title={fileName ?? undefined}>
-                {fileName ?? 'Archivo importado'}
+                {fileName ?? t('upload.subir')}
               </span>
               <span className="file-badge__meta">
-                {formatInteger(meta.importedRows)} filas
+                {t('upload.filas', { n: formatInteger(meta.importedRows) })}
                 {meta.periodoMin && meta.periodoMax
-                  ? ` · ${periodoLabel(meta.periodoMin)} – ${periodoLabel(meta.periodoMax)}`
+                  ? ` · ${periodoLabel(meta.periodoMin, locale)} – ${periodoLabel(meta.periodoMax, locale)}`
                   : ''}
               </span>
             </div>
@@ -38,9 +42,11 @@ export default function Header() {
               vacío del dashboard, para no duplicarla en pantalla. */}
           <FileUpload compact />
 
+          <Controls />
+
           {hasData ? (
             <button type="button" className="button button--ghost" onClick={clear}>
-              Quitar datos
+              {t('upload.quitar')}
             </button>
           ) : null}
         </div>

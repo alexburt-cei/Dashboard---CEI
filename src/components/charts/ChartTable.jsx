@@ -1,3 +1,5 @@
+import { useI18n } from '../../i18n/I18nContext';
+
 /**
  * Vista de datos de una gráfica, plegada bajo ella.
  *
@@ -12,12 +14,13 @@
  *   summaryLabel?: string,
  * }} props
  */
-export default function ChartTable({ caption, columns, rows, summaryLabel = 'Ver datos' }) {
+export default function ChartTable({ caption, columns, rows, summaryLabel }) {
+  const { t } = useI18n();
   if (!rows || rows.length === 0) return null;
 
   return (
     <details className="chart-table">
-      <summary className="chart-table__summary">{summaryLabel}</summary>
+      <summary className="chart-table__summary">{summaryLabel ?? t('chart.verDatos')}</summary>
       <div className="chart-table__scroll">
         <table className="data-table">
           <caption className="sr-only">{caption}</caption>

@@ -10,12 +10,8 @@ import { useData } from '../context/DataContext';
 import { getUniqueValues } from '../utils/dataTransform';
 import { aplicarFiltros, buildResumenGlobal } from '../utils/resumenGlobal';
 import { temporadaLabel } from '../utils/temporada';
-import {
-  formatEURCompact,
-  formatInteger,
-  formatPercent,
-  formatSignedEUR,
-} from '../utils/format';
+import { useFormatters } from '../utils/useFormatters';
+import { useI18n } from '../i18n/I18nContext';
 
 const FILTROS_VACIOS = { desde: '', hasta: '', sedes: [], formaciones: [], areas: [] };
 
@@ -37,6 +33,8 @@ function parseInputDate(value) {
  */
 export default function ResumenGlobalPage() {
   const { rows, hasData } = useData();
+  const { t, locale } = useI18n();
+  const { formatEURCompact, formatInteger, formatPercent, formatSignedEUR } = useFormatters();
   const [filtros, setFiltros] = useState(FILTROS_VACIOS);
 
   const opciones = useMemo(
@@ -70,10 +68,8 @@ export default function ResumenGlobalPage() {
   if (!hasData) {
     return (
       <section className="panel panel--empty">
-        <h1 className="panel__title">Resumen Global</h1>
-        <p className="panel__empty">
-          Sube el Excel de ingresos para ver la comparativa histórica, el ritmo y el cumplimiento.
-        </p>
+        <h1 className="panel__title">{t('resumen.titulo')}</h1>
+        <p className="panel__empty">{t('vacio.resumen')}</p>
         <FileUpload />
       </section>
     );
@@ -83,58 +79,66 @@ export default function ResumenGlobalPage() {
     ? [
         {
           id: 'crecimiento',
-          label: 'Crecimiento vs año anterior',
+          label: t('resumen.crecimiento'),
           value: resumen.crecimiento?.hayBase
             ? formatPercent(resumen.crecimiento.variacion)
             : '—',
           hint: resumen.crecimiento?.hayBase
-            ? `${temporadaLabel(resumen.crecimiento.temporadaAnterior)} al mismo avance`
-            : 'sin datos del año anterior',
+            ? t('resumen.crecimientoHint', {
+                temporada: temporadaLabel(resumen.crecimiento.temporadaAnterior, locale),
+              })
+            : t('resumen.sinBase'),
           delta:
             resumen.crecimiento?.variacion == null
               ? undefined
               : {
-                  text: `${formatSignedEUR(
-                    resumen.crecimiento.actual - resumen.crecimiento.anterior,
-                  )} vs año anterior`,
+                  text: t('resumen.vsAnterior', {
+                    valor: formatSignedEUR(
+                      resumen.crecimiento.actual - resumen.crecimiento.anterior,
+                    ),
+                  }),
                   direction: resumen.crecimiento.variacion >= 0 ? 'up' : 'down',
                 },
         },
         {
           id: 'runrate',
-          label: 'Run rate',
+          label: t('resumen.runRate'),
           value: resumen.runRate ? formatEURCompact(resumen.runRate.proyeccion) : '—',
           hint: resumen.runRate
-            ? `cierre estimado · ${formatPercent(resumen.runRate.fraccion)} de la convocatoria`
-            : 'convocatoria demasiado reciente para proyectar',
+            ? t('resumen.runRateHint', { porcentaje: formatPercent(resumen.runRate.fraccion) })
+            : t('resumen.runRateCorto'),
         },
         {
           id: 'stand',
-          label: 'Where we stand',
+          label: t('resumen.whereWeStand'),
           value: resumen.whereWeStand ? formatPercent(resumen.whereWeStand.cumplimiento) : '—',
           hint: resumen.whereWeStand
-            ? `objetivo de ${temporadaLabel(resumen.whereWeStand.temporada)}`
+            ? t('resumen.objetivoDe', { temporada: temporadaLabel(resumen.whereWeStand.temporada, locale) })
             : '',
           delta:
             resumen.whereWeStand?.ahead == null
               ? undefined
               : {
-                  text: `${resumen.whereWeStand.ahead ? 'Ahead' : 'Behind'} · ${formatSignedEUR(
-                    resumen.whereWeStand.gapProrrateado,
-                  )} vs ritmo`,
+                  text: `${
+                    resumen.whereWeStand.ahead ? t('canal.ahead') : t('canal.behind')
+                  } · ${t('resumen.vsRitmo', {
+                    valor: formatSignedEUR(resumen.whereWeStand.gapProrrateado),
+                  })}`,
                   direction: resumen.whereWeStand.ahead ? 'up' : 'down',
                 },
         },
         {
           id: 'ytd',
-          label: 'Year-to-date vs Budget',
+          label: t('resumen.ytd'),
           value: resumen.yearToDate ? formatPercent(resumen.yearToDate.cumplimiento) : '—',
-          hint: resumen.yearToDate ? `año ${resumen.yearToDate.anio}` : '',
+          hint: resumen.yearToDate ? t('resumen.anio', { anio: resumen.yearToDate.anio }) : '',
           delta:
             resumen.yearToDate?.ahead == null
               ? undefined
               : {
-                  text: `${formatSignedEUR(resumen.yearToDate.diferencia)} vs budget`,
+                  text: t('resumen.vsBudget', {
+                    valor: formatSignedEUR(resumen.yearToDate.diferencia),
+                  }),
                   direction: resumen.yearToDate.ahead ? 'up' : 'down',
                 },
         },
@@ -144,11 +148,14 @@ export default function ResumenGlobalPage() {
   return (
     <>
       <div className="resumen__head">
-        <h1 className="resumen__title">Resumen Global</h1>
+        <h1 className="resumen__title">{t('resumen.titulo')}</h1>
         {resumen ? (
           <p className="resumen__meta">
-            {temporadaLabel(resumen.temporada)} · datos hasta{' '}
-            {resumen.corte?.toISOString().slice(0, 10)} · {formatInteger(filtradas.length)} filas
+            {t('resumen.meta', {
+              temporada: temporadaLabel(resumen.temporada, locale),
+              fecha: resumen.corte?.toISOString().slice(0, 10),
+              filas: formatInteger(filtradas.length),
+            })}
           </p>
         ) : null}
       </div>
@@ -163,9 +170,7 @@ export default function ResumenGlobalPage() {
 
       {!resumen ? (
         <section className="panel">
-          <p className="panel__empty">
-            Los filtros no dejan ninguna fila. Amplía el rango o limpia la selección.
-          </p>
+          <p className="panel__empty">{t('vacio.filtros')}</p>
         </section>
       ) : (
         <>

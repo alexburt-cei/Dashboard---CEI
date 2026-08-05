@@ -39,6 +39,24 @@ export function niceStep(rawStep) {
   return (match?.step ?? 10) * magnitude;
 }
 
+/** Escalones legibles, en orden, para subir de uno al siguiente. */
+const STEP_LADDER = [1, 2, 2.5, 5, 10];
+
+/**
+ * Siguiente paso legible por encima del dado, cruzando de década cuando toca.
+ *
+ * Hace falta porque redondear al más cercano puede dar casi el doble de marcas
+ * de las pedidas: con un máximo de 73.000 y 5 marcas objetivo, el paso crudo de
+ * 14.600 se redondea a 10.000 —está por debajo del umbral 1,5— y el eje acaba
+ * con nueve etiquetas. Amontonadas, las dos últimas se tocan y se leen «70 k80 k».
+ */
+function nextNiceStep(step) {
+  const magnitude = 10 ** Math.floor(Math.log10(step));
+  const normalized = step / magnitude;
+  const siguiente = STEP_LADDER.find((candidate) => candidate > normalized + 1e-9);
+  return siguiente === undefined ? step * 10 : siguiente * magnitude;
+}
+
 /**
  * Construye una escala lineal con ticks redondos.
  *
@@ -70,7 +88,27 @@ export function buildScale(minValue, maxValue, targetTicks = 5) {
     };
   }
 
-  const step = niceStep(span / Math.max(1, targetTicks));
+  let step = niceStep(span / Math.max(1, targetTicks));
+
+  // Techo de etiquetas. Redondear al paso más cercano acierta en el caso normal,
+  // pero cuando cae por debajo del umbral deja casi el doble de marcas de las
+  // pedidas y las últimas se solapan. Se sube de escalón hasta caber.
+  //
+  // El margen de +2 no es arbitrario: el módulo elige a propósito el paso más
+  // cercano —y no siempre hacia arriba— para que un máximo de 51.000 dé seis
+  // marcas en vez de cuatro. Siete etiquetas caben holgadas; el solape empezaba
+  // a las nueve. Recortar más apretado desharía esa decisión.
+  //
+  // El corte de seguridad impide un bucle infinito si el paso deja de crecer.
+  const maxTicks = Math.max(2, targetTicks + 2);
+  for (let guard = 0; guard < 20; guard += 1) {
+    const desde = Math.floor(domainMin / step) * step;
+    const hasta = Math.ceil(domainMax / step) * step;
+    if (Math.round((hasta - desde) / step) + 1 <= maxTicks) break;
+    const subido = nextNiceStep(step);
+    if (subido <= step) break;
+    step = subido;
+  }
 
   // Se extiende el dominio a múltiplos del paso para que los extremos caigan
   // en un tick y las barras no se salgan del área de trazado.

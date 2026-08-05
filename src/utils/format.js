@@ -7,86 +7,109 @@
  */
 
 /**
- * `useGrouping: 'always'` no es cosmético.
+/**
+ * Los formateadores dependen del idioma, no sólo los textos.
  *
- * Por omisión, ICU en es-ES no agrupa los enteros de cuatro cifras: 9500 sale
- * «9500 €» mientras 12000 sale «12.000 €». Aislado es la convención tipográfica
- * española, pero en una columna de importes convive con los agrupados y se lee
- * como dos notaciones distintas para lo mismo — y en un salto de 9.500 a 12.000
- * el ojo compara longitudes de cadena, no valores.
+ * En castellano los miles van con punto y el decimal con coma; en inglés al
+ * revés. Traducir «Revenue» y dejar «1.234,56 €» produce una cifra que un lector
+ * británico lee como mil doscientos: el formato es parte de la traducción.
+ *
+ * Se construyen por locale y se memorizan, porque crear un `Intl.NumberFormat`
+ * no es gratis y estas funciones se llaman una vez por celda de tabla.
  */
-const EUR_FULL = new Intl.NumberFormat('es-ES', {
-  style: 'currency',
-  currency: 'EUR',
-  minimumFractionDigits: 0,
-  maximumFractionDigits: 0,
-  useGrouping: 'always',
-});
+const CACHE = new Map();
 
-const EUR_COMPACT = new Intl.NumberFormat('es-ES', {
-  style: 'currency',
-  currency: 'EUR',
-  notation: 'compact',
-  maximumFractionDigits: 1,
-});
+export function createFormatters(locale = 'es-ES') {
+  const cacheado = CACHE.get(locale);
+  if (cacheado) return cacheado;
 
-const INTEGER = new Intl.NumberFormat('es-ES', {
-  maximumFractionDigits: 0,
-  useGrouping: 'always',
-});
+  const EUR_FULL = new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: 'EUR',
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+    // `useGrouping: 'always'` no es cosmético: por omisión ICU no agrupa los
+    // enteros de cuatro cifras en es-ES, así que 9500 salía «9500 €» junto a
+    // «12.000 €». En una columna de importes se leen como dos notaciones para lo
+    // mismo, y el ojo compara longitudes de cadena antes que valores.
+    useGrouping: 'always',
+  });
 
-const PERCENT = new Intl.NumberFormat('es-ES', {
-  style: 'percent',
-  maximumFractionDigits: 1,
-});
+  const EUR_COMPACT = new Intl.NumberFormat(locale, {
+    style: 'currency',
+    currency: 'EUR',
+    notation: 'compact',
+    maximumFractionDigits: 1,
+  });
 
-/** Importe completo: 1.234.567 € */
-export function formatEUR(value) {
-  if (!Number.isFinite(value)) return '—';
-  return EUR_FULL.format(value);
+  const INTEGER = new Intl.NumberFormat(locale, {
+    maximumFractionDigits: 0,
+    useGrouping: 'always',
+  });
+
+  const PERCENT = new Intl.NumberFormat(locale, {
+    style: 'percent',
+    maximumFractionDigits: 1,
+  });
+
+  const DECIMAL_1 = new Intl.NumberFormat(locale, { maximumFractionDigits: 1 });
+
+  const api = {
+    locale,
+
+    formatEUR(value) {
+      if (!Number.isFinite(value)) return '—';
+      return EUR_FULL.format(value);
+    },
+
+    formatEURCompact(value) {
+      if (!Number.isFinite(value)) return '—';
+      return Math.abs(value) < 10000 ? EUR_FULL.format(value) : EUR_COMPACT.format(value);
+    },
+
+    formatInteger(value) {
+      if (!Number.isFinite(value)) return '—';
+      return INTEGER.format(value);
+    },
+
+    formatPercent(value) {
+      if (value === null || value === undefined || !Number.isFinite(value)) return '—';
+      return PERCENT.format(value);
+    },
+
+    formatAxisValue(value) {
+      if (!Number.isFinite(value)) return '';
+      const abs = Math.abs(value);
+      if (abs >= 1000000) return `${DECIMAL_1.format(value / 1000000)} M`;
+      if (abs >= 1000) return `${DECIMAL_1.format(value / 1000)} k`;
+      return INTEGER.format(value);
+    },
+
+    formatSignedEUR(value) {
+      if (!Number.isFinite(value)) return '—';
+      const sign = value > 0 ? '+' : '';
+      return `${sign}${EUR_FULL.format(value)}`;
+    },
+  };
+
+  CACHE.set(locale, api);
+  return api;
 }
 
 /**
- * Importe compacto para tarjetas: por debajo de 10.000 se muestra completo
- * (más informativo que "9,8 mil"), por encima se abrevia.
+ * Formateadores por omisión (es-ES). Se mantienen como exportaciones sueltas
+ * para lo que no vive dentro de React —y para los tests—; los componentes usan
+ * `useFormatters()`, que sigue al idioma elegido.
  */
-export function formatEURCompact(value) {
-  if (!Number.isFinite(value)) return '—';
-  return Math.abs(value) < 10000 ? EUR_FULL.format(value) : EUR_COMPACT.format(value);
-}
-
-export function formatInteger(value) {
-  if (!Number.isFinite(value)) return '—';
-  return INTEGER.format(value);
-}
-
-/** Ratio 0.87 -> "87 %". null cuando no hay base de cálculo. */
-export function formatPercent(value) {
-  if (value === null || value === undefined || !Number.isFinite(value)) return '—';
-  return PERCENT.format(value);
-}
-
-const DECIMAL_1 = new Intl.NumberFormat('es-ES', { maximumFractionDigits: 1 });
+const DEFAULTS = createFormatters('es-ES');
 
 /**
- * Valor abreviado para ticks de eje: 50000 -> "50 k", 2500 -> "2,5 k".
- *
- * No usa el formato compacto de Intl con moneda porque en es-ES devuelve
- * "50 mil €", demasiado largo para un eje. El símbolo € sobra: lo dice el
- * título de la gráfica.
+ * Exportaciones sueltas en es-ES, que delegan en los formateadores por omisión.
+ * Las mantiene todo lo que no vive dentro de React, y los tests.
  */
-export function formatAxisValue(value) {
-  if (!Number.isFinite(value)) return '';
-
-  const abs = Math.abs(value);
-  if (abs >= 1000000) return `${DECIMAL_1.format(value / 1000000)} M`;
-  if (abs >= 1000) return `${DECIMAL_1.format(value / 1000)} k`;
-  return INTEGER.format(value);
-}
-
-/** Delta con signo explícito, para comparaciones vs objetivo. */
-export function formatSignedEUR(value) {
-  if (!Number.isFinite(value)) return '—';
-  const sign = value > 0 ? '+' : '';
-  return `${sign}${EUR_FULL.format(value)}`;
-}
+export const formatEUR = (value) => DEFAULTS.formatEUR(value);
+export const formatEURCompact = (value) => DEFAULTS.formatEURCompact(value);
+export const formatInteger = (value) => DEFAULTS.formatInteger(value);
+export const formatPercent = (value) => DEFAULTS.formatPercent(value);
+export const formatAxisValue = (value) => DEFAULTS.formatAxisValue(value);
+export const formatSignedEUR = (value) => DEFAULTS.formatSignedEUR(value);

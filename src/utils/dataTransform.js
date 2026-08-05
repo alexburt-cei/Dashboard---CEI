@@ -51,10 +51,23 @@ export function totalIngreso(rows) {
  * @param {string} periodo
  * @returns {string}
  */
-export function periodoLabel(periodo) {
+export function periodoLabel(periodo, locale) {
   const match = /^(\d{4})-(\d{2})$/.exec(periodo ?? '');
   if (!match) return String(periodo ?? '');
   const monthIndex = Number(match[2]) - 1;
+
+  // Con locale, el nombre del mes lo da Intl: así «ene 2026» pasa a «Jan 2026»
+  // en inglés sin mantener una tabla de meses por idioma. Sin locale se usa la
+  // tabla en castellano, que es lo que espera quien llama desde fuera de React.
+  if (locale) {
+    const fecha = new Date(Date.UTC(Number(match[1]), monthIndex, 1));
+    return new Intl.DateTimeFormat(locale, {
+      month: 'short',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(fecha);
+  }
+
   const name = MONTH_SHORT[monthIndex];
   return name ? `${name} ${match[1]}` : match[1];
 }

@@ -1,6 +1,7 @@
 import { useCallback, useId, useRef, useState } from 'react';
 
 import { useData } from '../../context/DataContext';
+import { useI18n } from '../../i18n/I18nContext';
 
 /**
  * Carga del Excel.
@@ -14,6 +15,7 @@ import { useData } from '../../context/DataContext';
  */
 export default function FileUpload({ compact = false }) {
   const { loadFile, status, error, hasData } = useData();
+  const { t } = useI18n();
   const inputRef = useRef(null);
   const inputId = useId();
   const [isDragging, setIsDragging] = useState(false);
@@ -47,9 +49,9 @@ export default function FileUpload({ compact = false }) {
   const openPicker = useCallback(() => inputRef.current?.click(), []);
 
   const buttonLabel = (() => {
-    if (isParsing) return 'Leyendo…';
-    if (compact) return hasData ? 'Cambiar archivo' : 'Subir Excel';
-    return 'Seleccionar archivo';
+    if (isParsing) return t('upload.leyendo');
+    if (compact) return hasData ? t('upload.cambiar') : t('upload.subir');
+    return t('upload.seleccionar');
   })();
 
   const input = (
@@ -104,11 +106,8 @@ export default function FileUpload({ compact = false }) {
         onDragOver={onDragOver}
         onDragLeave={onDragLeave}
       >
-        <p className="file-upload__title">Arrastra aquí el Excel de ingresos</p>
-        <p className="file-upload__hint">
-          Columnas esperadas: Fecha, Tipo Formación, Área, Sede, Ingreso y Tipo Dato
-          (Real u Objetivo).
-        </p>
+        <p className="file-upload__title">{t('upload.arrastra')}</p>
+        <p className="file-upload__hint">{t('upload.columnas')}</p>
         {button}
       </div>
       {errorMessage}

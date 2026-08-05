@@ -1230,3 +1230,47 @@ p {
   background: var(--surface-sunken);
   border-radius: 3px;
 }
+
+/* ---------- Controles de tema e idioma ---------- */
+
+.controls {
+  display: flex;
+  align-items: center;
+  gap: var(--sp-2);
+}
+
+.controls__theme {
+  display: grid;
+  place-items: center;
+  width: 2.1rem;
+  height: 2.1rem;
+  padding: 0;
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  background: var(--surface-page);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.controls__theme:hover {
+  color: var(--text-primary);
+  border-color: var(--series-1);
+}
+
+.controls__select {
+  padding: var(--sp-2);
+  font-family: inherit;
+  font-size: 0.82rem;
+  color: var(--text-primary);
+  background: var(--surface-page);
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.controls__theme:focus-visible,
+.controls__select:focus-visible {
+  outline: 2px solid var(--series-1);
+  outline-offset: 1px;
+}

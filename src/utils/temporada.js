@@ -96,10 +96,28 @@ export function parseTemporadaKey(key) {
   return { anio: year, convocatoria };
 }
 
-/** Etiqueta visible de una temporada: 'Abr 2026'. */
-export function temporadaLabel(key) {
+/**
+ * Etiqueta visible de una temporada: 'Abr 2026'.
+ *
+ * Con `locale`, el mes de apertura lo nombra Intl, de modo que la convocatoria
+ * de enero se lee «Jan 2026» en inglés y «janv. 2026» en francés. Sin locale
+ * devuelve la abreviatura castellana de `CONVOCATORIAS`, que es lo que necesitan
+ * los tests y cualquier consumidor fuera de React.
+ */
+export function temporadaLabel(key, locale) {
   const parsed = parseTemporadaKey(key);
-  return parsed ? `${parsed.convocatoria.short} ${parsed.anio}` : '—';
+  if (!parsed) return '—';
+
+  if (locale) {
+    const fecha = new Date(Date.UTC(parsed.anio, parsed.convocatoria.mesInicio - 1, 1));
+    return new Intl.DateTimeFormat(locale, {
+      month: 'short',
+      year: 'numeric',
+      timeZone: 'UTC',
+    }).format(fecha);
+  }
+
+  return `${parsed.convocatoria.short} ${parsed.anio}`;
 }
 
 /**

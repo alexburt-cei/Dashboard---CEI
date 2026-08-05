@@ -162,3 +162,32 @@ describe('nearestIndex', () => {
     assert.equal(nearestIndex([], 5), -1);
   });
 });
+
+describe('techo de etiquetas del eje', () => {
+  it('no deja que las etiquetas se amontonen hasta solaparse', () => {
+    // El caso observado: máximo 73.000 daba nueve marcas y las dos últimas se
+    // tocaban en pantalla, leyéndose «70 k80 k».
+    const scale = buildScale(0, 73000);
+    assert.ok(scale.ticks.length <= 7, `${scale.ticks.length} marcas es demasiado`);
+    assert.deepEqual(scale.ticks, [0, 20000, 40000, 60000, 80000]);
+  });
+
+  it('respeta el paso más cercano cuando el resultado cabe', () => {
+    // Decisión previa del módulo, que este techo no debe deshacer: 51.000 con
+    // seis marcas en vez de cuatro.
+    assert.deepEqual(buildScale(0, 51000).ticks, [0, 10000, 20000, 30000, 40000, 50000, 60000]);
+  });
+
+  it('mantiene el techo en todo un barrido, sin dejar de cubrir el máximo', () => {
+    for (let max = 1; max <= 500000; max += 313) {
+      const scale = buildScale(0, max);
+      assert.ok(scale.ticks.length <= 7, `${max} produjo ${scale.ticks.length} marcas`);
+      assert.ok(scale.max >= max, `el eje ${scale.max} no cubre ${max}`);
+    }
+  });
+
+  it('honra un targetTicks distinto', () => {
+    assert.ok(buildScale(0, 73000, 3).ticks.length <= 5);
+    assert.ok(buildScale(0, 73000, 10).ticks.length <= 12);
+  });
+});
