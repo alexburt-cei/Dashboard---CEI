@@ -10,6 +10,7 @@ import RevenueTrendChart from './charts/RevenueTrendChart';
 import NotFoundPage from '../pages/NotFoundPage';
 import { getDimensionBySlug } from '../constants/dimensions';
 import { getSedeColor, isSedeDimension } from '../constants/sedeColors';
+import { DEFAULT_SCOPE_SLUG, filterByScope, getScopeBySlug } from '../constants/scopes';
 import { useFormatters } from '../utils/useFormatters';
 import { useI18n } from '../i18n/I18nContext';
 import { useData } from '../context/DataContext';
@@ -31,7 +32,7 @@ import {
  */
 export default function DimensionDashboard() {
   const { section } = useOutletContext();
-  const { dimension: dimensionSlug } = useParams();
+  const { dimension: dimensionSlug, scope: scopeSlug } = useParams();
   const { t } = useI18n();
   const { formatEURCompact, formatInteger, formatPercent, formatSignedEUR } = useFormatters();
   const { rows, issues, hasData } = useData();
@@ -44,19 +45,25 @@ export default function DimensionDashboard() {
   const view = useMemo(() => {
     if (!field) return null;
 
-    const sectionRows = filterByTipoDato(rows, section.tipoDato);
+    // El recorte se aplica ANTES de agrupar, y también a los totales de
+    // cumplimiento: si el ámbito filtrara sólo las gráficas, el porcentaje de
+    // abajo compararía las filas de Madrid contra el objetivo de toda España.
+    const scopedRows = filterByScope(rows, scopeSlug);
+    const sectionRows = filterByTipoDato(scopedRows, section.tipoDato);
 
     return {
       summary: summarize(sectionRows, field),
       byCategory: groupByField(sectionRows, field, { limit: MAX_CATEGORIAS_COLOREADAS }),
       byPeriodo: groupByPeriodo(sectionRows),
-      comparison: buildComparison(rows, field),
-      totalReal: totalIngreso(filterByTipoDato(rows, 'real')),
-      totalObjetivo: totalIngreso(filterByTipoDato(rows, 'objetivo')),
+      comparison: buildComparison(scopedRows, field),
+      totalReal: totalIngreso(filterByTipoDato(scopedRows, 'real')),
+      totalObjetivo: totalIngreso(filterByTipoDato(scopedRows, 'objetivo')),
     };
-  }, [rows, section.tipoDato, field]);
+  }, [rows, section.tipoDato, field, scopeSlug]);
 
-  if (!dimension) return <NotFoundPage />;
+  // Un ámbito inventado en la URL cae en NotFound, igual que una dimensión
+  // inventada: es preferible decirlo a renderizar el total en silencio.
+  if (!dimension || !getScopeBySlug(scopeSlug)) return <NotFoundPage />;
 
   if (!hasData) {
     return (
@@ -74,14 +81,27 @@ export default function DimensionDashboard() {
   const isObjetivos = section.tipoDato === 'objetivo';
 
   if (summary.registros === 0) {
+    // Dos motivos distintos para una pantalla vacía, y conviene no confundirlos:
+    // que el archivo no traiga filas de este Tipo Dato, o que el ámbito elegido
+    // se las haya llevado todas. Decir lo primero cuando pasa lo segundo manda a
+    // revisar el Excel en vez de a cambiar de pestaña.
+    const vaciaPorAmbito = scopeSlug !== DEFAULT_SCOPE_SLUG;
+
     return (
       <>
         <IssuesPanel issues={issues} />
         <div className="empty-state">
-          <p className="empty-state__title">Sin datos de {section.label.toLowerCase()}</p>
+          <p className="empty-state__title">
+            {vaciaPorAmbito
+              ? t('vacio.ambitoTitulo', { ambito: t(`scope.${scopeSlug}`) })
+              : t('vacio.tipoDatoTitulo', { seccion: t(`nav.${section.slug}`).toLowerCase() })}
+          </p>
           <p className="empty-state__body">
-            El archivo se ha importado, pero no contiene filas con Tipo Dato «
-            {isObjetivos ? 'Objetivo' : 'Real'}».
+            {vaciaPorAmbito
+              ? t('vacio.ambitoDetalle', { ambito: t(`scope.${scopeSlug}`) })
+              : t('vacio.tipoDatoDetalle', {
+                  tipo: isObjetivos ? t('tabla.objetivo') : t('comp.datoReal'),
+                })}
           </p>
         </div>
       </>

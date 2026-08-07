@@ -190,6 +190,20 @@ export const DICCIONARIOS = {
     'dim.cumplimientoDe': "Cumplimiento de {label}",
     'chart.ingresoRealSobreObjetivo': "Ingreso real sobre objetivo",
 
+    'scope.etiqueta': "Ámbito",
+    'scope.madrid': "Madrid",
+    'scope.sevilla': "Sevilla",
+    'scope.valencia': "Valencia",
+    'scope.online': "Online",
+    'scope.presencial': "Presencial",
+    'scope.total': "Total",
+    'scope.presencialHint': "Madrid + Valencia + Sevilla",
+
+    'vacio.ambitoTitulo': "Sin datos en {ambito}",
+    'vacio.ambitoDetalle': "El archivo se ha importado, pero ninguna fila pertenece a {ambito}. Prueba con otro ámbito o con Total.",
+    'vacio.tipoDatoTitulo': "Sin datos de {seccion}",
+    'vacio.tipoDatoDetalle': "El archivo se ha importado, pero no contiene filas con Tipo Dato «{tipo}».",
+
     'notfound.titulo': 'Esta página no existe',
     'notfound.volver': 'Volver al inicio',
   },
@@ -337,6 +351,20 @@ export const DICCIONARIOS = {
     'chart.readout': "{categoria}: {importe}, {porcentaje} of total, {n} records",
     'dim.cumplimientoDe': "{label} attainment",
     'chart.ingresoRealSobreObjetivo': "Actual revenue against target",
+
+    'scope.etiqueta': "Scope",
+    'scope.madrid': "Madrid",
+    'scope.sevilla': "Seville",
+    'scope.valencia': "Valencia",
+    'scope.online': "Online",
+    'scope.presencial': "On-site",
+    'scope.total': "Total",
+    'scope.presencialHint': "Madrid + Valencia + Seville",
+
+    'vacio.ambitoTitulo': "No data in {ambito}",
+    'vacio.ambitoDetalle': "The file was imported, but no row belongs to {ambito}. Try another scope, or Total.",
+    'vacio.tipoDatoTitulo': "No {seccion} data",
+    'vacio.tipoDatoDetalle': "The file was imported, but it has no rows with Data Type “{tipo}”.",
 
     'notfound.titulo': 'This page does not exist',
     'notfound.volver': 'Back to start',
@@ -487,6 +515,20 @@ export const DICCIONARIOS = {
     'chart.readout': "{categoria} : {importe}, {porcentaje} du total, {n} enregistrements",
     'dim.cumplimientoDe': "Atteinte de {label}",
     'chart.ingresoRealSobreObjetivo': "Revenu réel par rapport à l’objectif",
+
+    'scope.etiqueta': "Périmètre",
+    'scope.madrid': "Madrid",
+    'scope.sevilla': "Séville",
+    'scope.valencia': "Valence",
+    'scope.online': "En ligne",
+    'scope.presencial': "Présentiel",
+    'scope.total': "Total",
+    'scope.presencialHint': "Madrid + Valence + Séville",
+
+    'vacio.ambitoTitulo': "Aucune donnée dans {ambito}",
+    'vacio.ambitoDetalle': "Le fichier a été importé, mais aucune ligne n’appartient à {ambito}. Essayez un autre périmètre, ou Total.",
+    'vacio.tipoDatoTitulo': "Aucune donnée de {seccion}",
+    'vacio.tipoDatoDetalle': "Le fichier a été importé, mais il ne contient aucune ligne avec le Type de donnée « {tipo} ».",
 
     'notfound.titulo': 'Cette page n’existe pas',
     'notfound.volver': 'Retour à l’accueil',

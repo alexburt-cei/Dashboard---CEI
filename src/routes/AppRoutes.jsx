@@ -6,6 +6,7 @@ import {
   RESUMEN,
   SECTIONS,
 } from '../constants/dimensions';
+import { DEFAULT_SCOPE_SLUG } from '../constants/scopes';
 import DimensionDashboard from '../components/DimensionDashboard';
 import NotFoundPage from '../pages/NotFoundPage';
 import ObjetivosPage from '../pages/ObjetivosPage';
@@ -22,13 +23,12 @@ const SECTION_PAGES = {
  *
  *   /                       -> redirige a /reales/formacion
  *   /reales                 -> redirige a /reales/formacion
- *   /reales/formacion
- *   /reales/area
- *   /reales/sede
+ *   /reales/formacion       -> redirige a /reales/formacion/total
+ *   /reales/formacion/:scope
+ *   /reales/sede/:scope
  *   /objetivos              -> redirige a /objetivos/formacion
- *   /objetivos/formacion
- *   /objetivos/area
- *   /objetivos/sede
+ *   /objetivos/formacion/:scope
+ *   /objetivos/sede/:scope
  *   cualquier otra          -> NotFoundPage
  *
  * Cada sección es una ruta padre que pinta su TabNav y deja el cuerpo de la
@@ -48,7 +48,10 @@ export default function AppRoutes() {
         return (
           <Route key={section.slug} path={section.slug} element={<SectionPage />}>
             <Route index element={<Navigate to={DEFAULT_DIMENSION_SLUG} replace />} />
-            <Route path=":dimension" element={<DimensionDashboard />} />
+            {/* Una URL sin ámbito entra por Total, que es la vista de conjunto:
+                se baja al detalle desde ahí, no al revés. */}
+            <Route path=":dimension" element={<Navigate to={DEFAULT_SCOPE_SLUG} replace />} />
+            <Route path=":dimension/:scope" element={<DimensionDashboard />} />
           </Route>
         );
       })}

@@ -7,6 +7,7 @@ import {
   NAV_ITEMS,
   getDimensionBySlug,
 } from '../../constants/dimensions';
+import { DEFAULT_SCOPE_SLUG, getScopeBySlug } from '../../constants/scopes';
 
 /**
  * Navegación principal: Datos Reales / Objetivos.
@@ -21,10 +22,13 @@ import {
 export default function SectionNav() {
   const { pathname } = useLocation();
   const { t } = useI18n();
-  const [, sectionSlug, dimensionSlug] = pathname.split('/');
+  const [, sectionSlug, dimensionSlug, scopeSlug] = pathname.split('/');
 
   const currentDimension = getDimensionBySlug(dimensionSlug);
   const targetDimension = currentDimension?.slug ?? DEFAULT_DIMENSION_SLUG;
+  // El ámbito también sobrevive al salto de sección: de /reales/sede/madrid a
+  // /objetivos/sede/madrid, que es lo que espera quien está comparando.
+  const targetScope = getScopeBySlug(scopeSlug)?.slug ?? DEFAULT_SCOPE_SLUG;
 
   return (
     <nav className="section-nav" aria-label={t('nav.secciones')}>
@@ -32,7 +36,9 @@ export default function SectionNav() {
         const isActive = item.slug === sectionSlug;
         // Resumen Global no tiene pestañas, así que su enlace es la ruta a
         // secas; a las otras se les conserva la dimensión activa.
-        const to = item.hasDimensions ? `${item.path}/${targetDimension}` : item.path;
+        const to = item.hasDimensions
+          ? `${item.path}/${targetDimension}/${targetScope}`
+          : item.path;
         return (
           <Link
             key={item.slug}

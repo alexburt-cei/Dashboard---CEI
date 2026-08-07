@@ -1274,3 +1274,38 @@ p {
   outline: 2px solid var(--series-1);
   outline-offset: 1px;
 }
+
+/* ---------- Segundo nivel de pestañas: ámbito ---------- */
+
+/* Peso visual menor que TabNav a propósito: son dos preguntas anidadas
+   —por qué se agrupa, y sobre qué filas— y al mismo peso se leerían como seis
+   pestañas más de la misma fila. */
+.scope-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--sp-1);
+  margin: 0 0 var(--sp-5);
+  padding-bottom: var(--sp-2);
+  border-bottom: 1px solid var(--border);
+}
+
+.scope-nav__item {
+  padding: var(--sp-1) var(--sp-3);
+  color: var(--text-secondary);
+  font-size: 0.82rem;
+  text-decoration: none;
+  border-radius: var(--radius-sm);
+  border: 1px solid transparent;
+}
+
+.scope-nav__item:hover {
+  color: var(--text-primary);
+  background: var(--surface-sunken);
+}
+
+.scope-nav__item[data-active] {
+  color: var(--text-primary);
+  font-weight: 600;
+  background: var(--surface-1);
+  border-color: var(--border-strong);
+}

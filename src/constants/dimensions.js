@@ -50,12 +50,6 @@ export const DIMENSIONS = [
     column: 'Tipo Formación',
   },
   {
-    slug: 'area',
-    label: 'Área',
-    field: 'area',
-    column: 'Área',
-  },
-  {
     slug: 'sede',
     label: 'Sede',
     field: 'sede',
@@ -65,6 +59,10 @@ export const DIMENSIONS = [
 
 /** Pestaña a la que se redirige cuando la URL sólo trae la sección. */
 export const DEFAULT_DIMENSION_SLUG = DIMENSIONS[0].slug;
+
+// Los ámbitos (Madrid, Sevilla, Valencia, Online, Presencial, Total) viven en
+// constants/scopes.js: son un recorte de filas, no una dimensión de agrupación,
+// y mezclarlos aquí habría hecho creer al router que son otra pestaña más.
 
 /**
  * Resumen Global. Va aparte de `SECTIONS` porque no tiene pestañas de
